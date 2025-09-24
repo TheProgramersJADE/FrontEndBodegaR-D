@@ -101,5 +101,18 @@ namespace FrontEndBodega.Services
             var errorContent = await response.Content.ReadAsStringAsync();
             return $"Error al actualizar usuario ❌: {response.StatusCode} - {errorContent}";
         }
+
+        //Buscar por id
+        public async Task<UsuarioDTO?> BuscarUsuarioPorIdAsync(int id)
+        {
+            if (!await SetAuthorizationHeader())
+                return null;
+
+            var response = await _httpClient.GetAsync($"api/users/{id}");
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<UsuarioDTO>();
+
+            return null;
+        }
     }
 }

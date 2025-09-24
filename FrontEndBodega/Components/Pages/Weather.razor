@@ -4,91 +4,101 @@
 @inject RegistroUserService UsuarioServicee
 @inject NavigationManager NavManager
 
-
 <h3>Lista de Usuarios</h3>
 
-@if (usuarios == null)
-{
-    <p><em>Cargando...</em></p>
-}
-else if (!usuarios.Any())
-{
-    <p>No hay usuarios disponibles.</p>
-}
-else
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Correo</th>
-                <th>Nombre</th>
-                <th>Teléfono</th>
-                <th>Username</th>
-                <th>Rol</th>
-                <th>Status</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in usuarios)
-            {
-                <tr>
-                    <td>@user.CorreoElectronico</td>
-                    <td>@user.NombreCompleto</td>
-                    <td>@user.Telefono</td>
-                    <td>@user.Username</td>
-                    <td>@user.IdRol</td>
-                    <td>@(user.Status == 1 ? "Activo" : "Inactivo")</td>
-                    <td>
-                        <button class="btn btn-info" @onclick='() => NavManager.NavigateTo($"/usuarios/ver/{user.Id}")'>Ver</button>
-                        <button class="btn btn-warning" @onclick='() => NavManager.NavigateTo($"/usuarios/editar/{user.Id}")'>Editar</button>
-                        <button class="btn btn-danger" @onclick='() => EliminarUsuario(user.Id)'>Eliminar</button>
-                        >
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<!-- Campo de búsqueda -->
+<div class="mb-3">
+    <input type="number" @bind="idBusqueda" placeholder="Ingrese ID del usuario" class="form-control" />
+    <button class="btn btn-primary mt-2" @onclick="BuscarUsuario">Buscar</button>
+    <button class="btn btn-secondary mt-2 ms-2" @onclick="ResetBusqueda">Mostrar Todos</button>
+</div>
 
 @if (!string.IsNullOrEmpty(mensaje))
 {
     <p>@mensaje</p>
 }
 
+<!-- Tabla de usuarios -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in usuarios)
+        {
+            <tr>
+                <td>@user.Id</td>
+                <td>@user.NombreCompleto</td>
+                <td>@user.CorreoElectronico</td>
+                <td>
+                    <button class="btn btn-info" @onclick='() => NavManager.NavigateTo($"/usuarios/ver/{user.Id}")'>Ver</button>
+                    <button class="btn btn-warning" @onclick='() => NavManager.NavigateTo($"/usuarios/editar/{user.Id}")'>Editar</button>
+                    <button class="btn btn-danger" @onclick='() => EliminarUsuario(user.Id)'>Eliminar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
 @code {
-    private List<UsuarioDTO>? usuarios;
+    private List<UsuarioDTO> usuarios = new List<UsuarioDTO>();
+    private int idBusqueda;
     private string? mensaje;
 
     protected override async Task OnInitializedAsync()
     {
+        await CargarUsuarios();
+    }
+
+    private async Task CargarUsuarios()
+    {
         usuarios = await UsuarioServicee.GetUsuariosAsync();
-    }
-
-    private void VerUsuario(int id)
-    {
-        NavManager.NavigateTo($"/usuarios/ver/{id}");
-        mensaje = $"Mostrando detalle del usuario con Id = {id}";
-        // Aquí podrías abrir un modal o navegar a otra página
-    }
-
-    private void EditarUsuario(int id)
-    {
-        mensaje = $"Editar usuario con Id = {id}";
-        // Aquí podrías navegar a /editar-usuario/{id}
     }
 
     private async Task EliminarUsuario(int id)
     {
-        var ok = await UsuarioServicee.EliminarUsuarioAsync(id);
+        bool ok = await UsuarioServicee.EliminarUsuarioAsync(id);
         if (ok)
         {
             mensaje = "Usuario eliminado ✅";
-            usuarios = await UsuarioServicee.GetUsuariosAsync();
+            await CargarUsuarios();
         }
         else
         {
             mensaje = "Error al eliminar usuario ❌";
         }
+    }
+
+    private async Task BuscarUsuario()
+    {
+        if (idBusqueda <= 0)
+        {
+            mensaje = "Ingrese un ID válido";
+            return;
+        }
+
+        var usuario = await UsuarioServicee.BuscarUsuarioPorIdAsync(idBusqueda);
+        if (usuario != null)
+        {
+            usuarios = new List<UsuarioDTO> { usuario }; // Mostrar solo el buscado
+            mensaje = $"Mostrando usuario con ID {idBusqueda}";
+        }
+        else
+        {
+            usuarios = new List<UsuarioDTO>();
+            mensaje = $"No se encontró usuario con ID {idBusqueda}";
+        }
+    }
+
+    private async Task ResetBusqueda()
+    {
+        idBusqueda = 0;
+        mensaje = null;
+        await CargarUsuarios();
     }
 }
