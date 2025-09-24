@@ -1,63 +1,94 @@
 ﻿@page "/weather"
+@using FrontEndBodega.Services;
+@using FrontEndBodega.DTO;
+@inject RegistroUserService UsuarioServicee
+@inject NavigationManager NavManager
 
-<PageTitle>Weather</PageTitle>
 
-<h1>Weather</h1>
+<h3>Lista de Usuarios</h3>
 
-<p>This component demonstrates showing data.</p>
-
-@if (forecasts == null)
+@if (usuarios == null)
 {
-    <p><em>Loading...</em></p>
+    <p><em>Cargando...</em></p>
+}
+else if (!usuarios.Any())
+{
+    <p>No hay usuarios disponibles.</p>
 }
 else
 {
-    <table class="table">
+    <table class="table table-striped">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
+                <th>Correo</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Username</th>
+                <th>Rol</th>
+                <th>Status</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+            @foreach (var user in usuarios)
             {
                 <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
+                    <td>@user.CorreoElectronico</td>
+                    <td>@user.NombreCompleto</td>
+                    <td>@user.Telefono</td>
+                    <td>@user.Username</td>
+                    <td>@user.IdRol</td>
+                    <td>@(user.Status == 1 ? "Activo" : "Inactivo")</td>
+                    <td>
+                        <button class="btn btn-info" @onclick='() => NavManager.NavigateTo($"/usuarios/ver/{user.Id}")'>Ver</button>
+                        <button class="btn btn-warning" @onclick='() => NavManager.NavigateTo($"/usuarios/editar/{user.Id}")'>Editar</button>
+                        <button class="btn btn-danger" @onclick='() => EliminarUsuario(user.Id)'>Eliminar</button>
+                        >
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 }
 
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <p>@mensaje</p>
+}
+
 @code {
-    private WeatherForecast[]? forecasts;
+    private List<UsuarioDTO>? usuarios;
+    private string? mensaje;
 
     protected override async Task OnInitializedAsync()
     {
-        // Simulate asynchronous loading to demonstrate a loading indicator
-        await Task.Delay(500);
-
-        var startDate = DateOnly.FromDateTime(DateTime.Now);
-        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
-        {
-            Date = startDate.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = summaries[Random.Shared.Next(summaries.Length)]
-        }).ToArray();
+        usuarios = await UsuarioServicee.GetUsuariosAsync();
     }
 
-    private class WeatherForecast
+    private void VerUsuario(int id)
     {
-        public DateOnly Date { get; set; }
-        public int TemperatureC { get; set; }
-        public string? Summary { get; set; }
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        NavManager.NavigateTo($"/usuarios/ver/{id}");
+        mensaje = $"Mostrando detalle del usuario con Id = {id}";
+        // Aquí podrías abrir un modal o navegar a otra página
+    }
+
+    private void EditarUsuario(int id)
+    {
+        mensaje = $"Editar usuario con Id = {id}";
+        // Aquí podrías navegar a /editar-usuario/{id}
+    }
+
+    private async Task EliminarUsuario(int id)
+    {
+        var ok = await UsuarioServicee.EliminarUsuarioAsync(id);
+        if (ok)
+        {
+            mensaje = "Usuario eliminado ✅";
+            usuarios = await UsuarioServicee.GetUsuariosAsync();
+        }
+        else
+        {
+            mensaje = "Error al eliminar usuario ❌";
+        }
     }
 }

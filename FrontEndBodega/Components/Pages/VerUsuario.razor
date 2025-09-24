@@ -1,0 +1,33 @@
+﻿@page "/usuarios/ver/{id:int}"
+@using FrontEndBodega.Services;
+@using FrontEndBodega.DTO;
+@inject NavigationManager NavManager
+@inject RegistroUserService UsuarioServicee
+
+
+<h3>Detalle del Usuario</h3>
+
+@if (usuario == null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <div class="card p-3 shadow-sm">
+        <p><strong>ID:</strong> @usuario.Id</p>
+        <p><strong>Nombre:</strong> @usuario.NombreCompleto</p>
+        <p><strong>Correo:</strong> @usuario.CorreoElectronico</p>
+
+        <button class="btn btn-secondary" @onclick='() => NavManager.NavigateTo("/weather")'>Volver</button>
+    </div>
+}
+
+@code { 
+    [Parameter] public int id { get; set; }
+    private UsuarioDTO? usuario;
+
+    protected override async Task OnInitializedAsync()
+    {
+        usuario = await UsuarioServicee.GetUsuarioByIdAsync(id);
+    }
+}}

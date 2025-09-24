@@ -1,0 +1,49 @@
+﻿@page "/usuarios/editar/{id:int}"
+@using FrontEndBodega.Services;
+@using FrontEndBodega.DTO;
+@inject RegistroUserService UserService
+@inject NavigationManager NavManager
+
+<h3>Editar Usuario</h3>
+
+@if (usuario == null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <EditForm Model="@usuario" OnValidSubmit="Guardar">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label>Nombre:</label>
+            <InputText @bind-Value="usuario.NombreCompleto" class="form-control" />
+        </div>
+        <div>
+            <label>Correo:</label>
+            <InputText @bind-Value="usuario.CorreoElectronico" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick='() => NavManager.NavigateTo("/usuarios")'>Cancelar</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+    private UsuarioDTO? usuario;
+
+    protected override async Task OnInitializedAsync()
+    {
+        usuario = await UserService.GetUsuarioByIdAsync(id);
+    }
+
+    private async Task Guardar()
+    {
+        var result = await UserService.EditarUsuarioAsync(id, usuario);
+        Console.WriteLine(result);
+        NavManager.NavigateTo("/weather"); // volver a la lista
+    }
+}
+
