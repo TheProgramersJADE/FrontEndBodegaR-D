@@ -1,18 +1,61 @@
-﻿@page "/counter"
+﻿@page "/Counter"
+@using FrontEndBodega.Services;
+@using FrontEndBodega.DTO;
+@inject RegistroUserService UsuarioService
 
-<PageTitle>Counter</PageTitle>
+<h3>Crear Usuario</h3>
 
-<h1>Counter</h1>
+<EditForm Model="@usuario" OnValidSubmit="GuardarUsuario">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-<p role="status">Current count: @currentCount</p>
+    <div>
+        <label>Correo Electrónico:</label>
+        <InputText @bind-Value="usuario.CorreoElectronico" class="form-control" />
+    </div>
+    <div>
+        <label>Dirección:</label>
+        <InputText @bind-Value="usuario.Direccion" class="form-control" />
+    </div>
+    <div>
+        <label>Nombre Completo:</label>
+        <InputText @bind-Value="usuario.NombreCompleto" class="form-control" />
+    </div>
+    <div>
+        <label>Password:</label>
+        <InputText @bind-Value="usuario.Password" type="password" class="form-control" />
+    </div>
+    <div>
+        <label>Teléfono:</label>
+        <InputText @bind-Value="usuario.Telefono" class="form-control" />
+    </div>
+    <div>
+        <label>Username:</label>
+        <InputText @bind-Value="usuario.Username" class="form-control" />
+    </div>
+    <div>
+        <label>Rol:</label>
+        <InputNumber @bind-Value="usuario.IdRol" class="form-control" />
+    </div>
+    <div>
+        <label>Status:</label>
+        <InputNumber @bind-Value="usuario.Status" class="form-control" />
+    </div>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</EditForm>
+
+@if (mensaje != null)
+{
+    <p>@mensaje</p>
+}
 
 @code {
-    private int currentCount = 0;
+    private RegistroUserDTO usuario = new();
+    private string? mensaje;
 
-    private void IncrementCount()
+    private async Task GuardarUsuario()
     {
-        currentCount++;
+        mensaje = await UsuarioService.CrearUsuarioAsync(usuario);
     }
 }

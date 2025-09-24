@@ -13,7 +13,10 @@ builder.Services.AddScoped(o => new HttpClient
     BaseAddress = new Uri("https://api-gateway-nodejs-ryd-miih.onrender.com/ApiAutenticacion/")
 });
 
+// Dentro de Program.cs
+builder.Services.AddScoped<RegistroUserService>();
 builder.Services.AddScoped<AutheService>();
+
 
 var app = builder.Build();
 
