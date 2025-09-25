@@ -1,7 +1,8 @@
 ﻿namespace FrontEndBodega.DTO
-{   public class CategoriaListResponse
+{
+    public class CategoriaSingleResponse
     {
-        public List<CategoriaDTO> data { get; set; } = new List<CategoriaDTO>();
+        public CategoriaDTO? data { get; set; }
         public bool success { get; set; }
         public string mensaje { get; set; } = string.Empty;
     }

@@ -42,6 +42,7 @@ namespace FrontEndBodega.Services
                     return $"❌ Error al crear categoría: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}";
             }
 
+        // Listar todas las categorías
         public async Task<List<CategoriaDTO>> GetCategoriasAsync()
         {
             if (!await SetAuthorizationHeader()) return new List<CategoriaDTO>();
@@ -56,16 +57,26 @@ namespace FrontEndBodega.Services
             return new List<CategoriaDTO>();
         }
 
-
-        //  Obtener categoría por Id
+        // Obtener categoría por Id
         public async Task<CategoriaDTO?> GetCategoriaByIdAsync(int id)
-            {
-                if (!await SetAuthorizationHeader()) return null;
-                return await client.GetFromJsonAsync<CategoriaDTO>($"api/categorias/{id}");
-            }
+        {
+            if (!await SetAuthorizationHeader()) return null;
 
-            //  Editar categoría
-            public async Task<string> EditarCategoriaAsync(int id, CategoriaDTO categoria)
+            var response = await client.GetAsync($"api/categorias/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<CategoriaSingleResponse>();
+                return result?.data;
+            }
+            return null;
+        }
+
+
+
+
+
+        //  Editar categoría
+        public async Task<string> EditarCategoriaAsync(int id, CategoriaDTO categoria)
             {
                 if (!await SetAuthorizationHeader()) return "Error: No autorizado";
 
