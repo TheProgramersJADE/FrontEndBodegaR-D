@@ -8,15 +8,23 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 
+// Cliente para Autenticación (ya lo tienes)
 builder.Services.AddScoped(o => new HttpClient
 {
     BaseAddress = new Uri("https://api-gateway-nodejs-ryd-miih.onrender.com/ApiAutenticacion/")
+});
+
+// Cliente para Administración (nuevo)
+builder.Services.AddHttpClient("Administracion", client =>
+{
+    client.BaseAddress = new Uri("https://api-gateway-nodejs-ryd-miih.onrender.com/ApiAdministracion/");
 });
 
 // Dentro de Program.cs
 builder.Services.AddScoped<RegistroUserService>();
 builder.Services.AddScoped<AutheService>();
 builder.Services.AddScoped<RolService>();
+builder.Services.AddScoped<CategoriaService>();
 
 
 var app = builder.Build();

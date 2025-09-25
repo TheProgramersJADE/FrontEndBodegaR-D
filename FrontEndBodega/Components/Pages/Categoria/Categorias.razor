@@ -1,0 +1,104 @@
+﻿@page "/categorias"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject CategoriaService CategoriaService
+@inject NavigationManager NavManager
+
+<h3>📋 Lista de Categorías</h3>
+
+@if (!_cargado)
+{
+    <p>Cargando...</p>
+}
+else if (categorias.Count == 0)
+{
+    <p>No hay categorías registradas.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cat in categorias)
+            {
+                <tr>
+                    <td>@cat.Id</td>
+                    <td>@cat.Nombre</td>
+                    <td>@cat.Descripcion</td>
+                    <td>
+                        <button class="btn btn-info"
+                                @onclick='() => NavManager.NavigateTo($"/categorias/ver/{cat.Id}")'>
+                            Ver
+                        </button>
+                        <button class="btn btn-warning"
+                                @onclick='() => NavManager.NavigateTo($"/categorias/editar/{cat.Id}")'>
+                            Editar
+                        </button>
+                        <button class="btn btn-danger"
+                                @onclick="() => EliminarCategoria(cat.Id)">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<p>@mensaje</p>
+
+@code {
+    private bool _cargado = false;
+    private bool _primerRender = true;
+    private List<CategoriaDTO> categorias = new();
+    private string mensaje = string.Empty;
+
+    // 🔹 Cargar datos después del primer render
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_primerRender)
+        {
+            _primerRender = false;
+
+            try
+            {
+                categorias = await CategoriaService.GetCategoriasAsync();
+            }
+            catch (Exception ex)
+            {
+                mensaje = $"❌ Error al cargar categorías: {ex.Message}";
+            }
+
+            _cargado = true;
+            StateHasChanged(); // Forzar refresco
+        }
+    }
+
+    private async Task EliminarCategoria(int id)
+    {
+        try
+        {
+            var ok = await CategoriaService.EliminarCategoriaAsync(id);
+            if (ok)
+            {
+                mensaje = "✅ Categoría eliminada";
+                categorias = await CategoriaService.GetCategoriasAsync();
+            }
+            else
+            {
+                mensaje = "❌ Error al eliminar categoría";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"❌ Error al eliminar categoría: {ex.Message}";
+        }
+    }
+}

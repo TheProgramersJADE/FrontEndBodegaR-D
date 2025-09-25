@@ -1,0 +1,39 @@
+﻿@page "/categorias/crear"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject NavigationManager NavManager
+@inject CategoriaService CategoriaService
+
+<h3>Crear Categoría</h3>
+
+<EditForm Model="@categoria" OnValidSubmit="GuardarCategoria">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Nombre</label>
+        <InputText @bind-Value="categoria.Nombre" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Descripción</label>
+        <InputText @bind-Value="categoria.Descripcion" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button class="btn btn-secondary mt-3" @onclick='@(() => NavManager.NavigateTo("/categorias"))'>Listar categorias</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-info mt-3">@mensaje</div>
+}
+
+@code {
+    private CategoriaDTO categoria = new();
+    private string? mensaje;
+
+    private async Task GuardarCategoria()
+    {
+        mensaje = await CategoriaService.CrearCategoriaAsync(categoria);
+    }
+}

@@ -1,0 +1,85 @@
+﻿@page "/categorias/editar/{Id:int}"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject CategoriaService CategoriaService
+@inject NavigationManager NavManager
+
+<h3>✏ Editar Categoría</h3>
+
+@if (!_cargado)
+{
+    <p>Cargando...</p>
+}
+else if (categoria == null)
+{
+    <p>❌ Categoría no encontrada</p>
+}
+else
+{
+    <EditForm Model="categoria" OnValidSubmit="GuardarCambios">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label>Nombre</label>
+            <InputText class="form-control" @bind-Value="categoria.Nombre" />
+        </div>
+
+        <div class="mb-3">
+            <label>Descripción</label>
+            <InputText class="form-control" @bind-Value="categoria.Descripcion" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick='() => NavManager.NavigateTo("/categorias")'>Cancelar</button>
+    </EditForm>
+}
+
+<p>@mensaje</p>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private CategoriaDTO? categoria;
+    private bool _cargado = false;
+    private string mensaje = string.Empty;
+    private bool _primerRender = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_primerRender)
+        {
+            _primerRender = false;
+            try
+            {
+                categoria = await CategoriaService.GetCategoriaByIdAsync(Id);
+            }
+            catch (Exception ex)
+            {
+                mensaje = $"❌ Error al cargar categoría: {ex.Message}";
+            }
+            _cargado = true;
+            StateHasChanged();
+        }
+    }
+
+    private async Task GuardarCambios()
+    {
+        if (categoria == null) return;
+
+        try
+        {
+            var resultado = await CategoriaService.EditarCategoriaAsync(Id, categoria);
+            mensaje = resultado;
+            if (resultado.StartsWith("✅"))
+            {
+                // Regresar a la lista después de guardar
+                NavManager.NavigateTo("/categorias");
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"❌ Error al guardar cambios: {ex.Message}";
+        }
+    }
+}

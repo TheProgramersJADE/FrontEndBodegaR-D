@@ -1,0 +1,49 @@
+﻿@page "/categorias/ver/{Id:int}"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject CategoriaService CategoriaService
+@inject NavigationManager NavManager
+
+<h3>🔍 Ver Categoría</h3>
+
+@if (!_cargado)
+{
+    <p>Cargando...</p>
+}
+else if (categoria == null)
+{
+    <p>❌ Categoría no encontrada</p>
+}
+else
+{
+    <div class="card p-3">
+        <p><strong>Id:</strong> @categoria.Id</p>
+        <p><strong>Nombre:</strong> @categoria.Nombre</p>
+        <p><strong>Descripción:</strong> @categoria.Descripcion</p>
+        <button class="btn btn-secondary" @onclick='() => NavManager.NavigateTo("/categorias")'>Volver</button>
+        <button class="btn btn-warning" @onclick='() => NavManager.NavigateTo($"/categorias/editar/{categoria.Id}")'>Editar</button>
+    </div>
+}
+
+<p>@mensaje</p>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private CategoriaDTO? categoria;
+    private bool _cargado = false;
+    private string mensaje = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            categoria = await CategoriaService.GetCategoriaByIdAsync(Id);
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"❌ Error al cargar categoría: {ex.Message}";
+        }
+        _cargado = true;
+    }
+}
