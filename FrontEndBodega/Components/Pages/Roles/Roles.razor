@@ -1,0 +1,112 @@
+﻿@page "/roles"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject RolService RolService
+@inject NavigationManager NavManager
+
+
+<h3>Buscar Rol por Id</h3>
+
+<div class="mb-3">
+    <input type="number" @bind="rolIdBuscar" placeholder="Ingrese Id del rol" class="form-control" />
+    <button class="btn btn-primary mt-2" @onclick="BuscarRolPorId">Buscar</button>
+</div>
+
+@if (rolBuscado != null)
+{
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">Rol encontrado ✅</h5>
+            <p><b>Id:</b> @rolBuscado.Id</p>
+            <p><b>Nombre:</b> @rolBuscado.NombreRol</p>
+            <p><b>Descripción:</b> @rolBuscado.Descripcion</p>
+        </div>
+    </div>
+}
+else if (!string.IsNullOrEmpty(mensajeBusqueda))
+{
+    <div class="alert alert-warning mt-2">@mensajeBusqueda</div>
+}
+<h3>Listado de Roles</h3>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-info">@mensaje</div>
+}
+
+@if (roles == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre Rol</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var roll in roles)
+            {
+                <tr>
+                    <td>@roll.Id</td>
+                    <td>@roll.NombreRol</td>
+                    <td>@roll.Descripcion</td>
+                    <td>
+                        <button class="btn btn-info" @onclick='() => NavManager.NavigateTo($"/roles/ver/{roll.Id}")'>Ver</button>
+                        <button class="btn btn-warning" @onclick='() => NavManager.NavigateTo($"/roles/editar/{roll.Id}")'>Editar</button>
+                        <button class="btn btn-danger" @onclick='() => EliminarRol(roll.Id)'>Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<RolDTO>? roles;
+    private string mensaje = string.Empty;
+    private string mensajeBusqueda = string.Empty;
+    private RolDTO? rolBuscado;
+    private int rolIdBuscar;          // 🔹 para el input de búsqueda
+
+    protected override async Task OnInitializedAsync()
+    {
+        roles = await RolService.GetRolesAsync();
+    }
+
+    private async Task EliminarRol(int id)
+    {
+        var ok = await RolService.EliminarRolAsync(id);
+        if (ok)
+        {
+            mensaje = "Rol eliminado ✅";
+            roles = await RolService.GetRolesAsync(); // refresca la tabla
+        }
+        else
+        {
+            mensaje = "Error al eliminar ❌";
+        }
+    }
+
+    private async Task BuscarRolPorId()
+    {
+        rolBuscado = null; // 🔹 limpiar el rol anterior
+        mensajeBusqueda = string.Empty;
+
+        var resultado = await RolService.GetRolByIdAsync(rolIdBuscar);
+
+        if (resultado == null)
+        {
+            mensajeBusqueda = $"No se encontró ningún rol con Id {rolIdBuscar} ❌";
+        }
+        else
+        {
+            rolBuscado = resultado; // 🔹 asignar solo si se encontró
+        }
+    }
+}

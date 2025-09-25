@@ -1,0 +1,64 @@
+﻿@page "/roles/crear"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject RolService RolService
+@inject NavigationManager NavManager
+
+<h3>Crear Rol</h3>
+
+<EditForm Model="@rol" OnValidSubmit="GuardarRol">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Nombre del Rol:</label>
+        <InputText @bind-Value="rol.NombreRol" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Descripción:</label>
+        <InputText @bind-Value="rol.Descripcion" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+
+    <button class="btn btn-secondary mt-3" @onclick='() => NavManager.NavigateTo("/roles")'>lisat de roles</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <p>@mensaje</p>
+}
+
+@code {
+    private RolDTO rol = new RolDTO();
+    private string? mensaje;
+    private int maxRoles = 5; // Límite de roles permitidos
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Podés traer la lista de roles desde el servicio si querés contar los existentes
+        var listaRoles = await RolService.GetRolesAsync();
+        if (listaRoles.Count >= maxRoles)
+        {
+            mensaje = $"Ya no se pueden agregar más roles. Límite: {maxRoles}";
+        }
+    }
+
+    private async Task GuardarRol()
+    {
+        var listaRoles = await RolService.GetRolesAsync();
+        if (listaRoles.Count >= maxRoles)
+        {
+            // Mostrar alerta si se alcanzó el límite
+            await JS.InvokeVoidAsync("alert", $"Ya no se pueden agregar más roles. Límite: {maxRoles}");
+            return;
+        }
+
+        var result = await RolService.CrearRolAsync(rol);
+        mensaje = result;
+    }
+
+    [Inject]
+    private IJSRuntime JS { get; set; } = default!;
+}

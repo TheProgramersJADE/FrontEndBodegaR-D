@@ -1,0 +1,33 @@
+﻿@page "/roles/ver/{Id:int}"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject RolService RolService
+@inject NavigationManager NavManager
+
+<h3>Detalle del Rol</h3>
+
+@if (rol == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">@rol.NombreRol</h5>
+            <p class="card-text">@rol.Descripcion</p>
+        </div>
+    </div>
+
+    <button class="btn btn-secondary mt-3" @onclick='() => NavManager.NavigateTo("/roles")'>Volver</button>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private RolDTO? rol;
+
+    protected override async Task OnInitializedAsync()
+    {
+        rol = await RolService.GetRolByIdAsync(Id);
+    }
+}

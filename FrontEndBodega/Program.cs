@@ -16,6 +16,7 @@ builder.Services.AddScoped(o => new HttpClient
 // Dentro de Program.cs
 builder.Services.AddScoped<RegistroUserService>();
 builder.Services.AddScoped<AutheService>();
+builder.Services.AddScoped<RolService>();
 
 
 var app = builder.Build();

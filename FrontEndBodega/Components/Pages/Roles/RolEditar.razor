@@ -1,0 +1,58 @@
+﻿@page "/roles/editar/{Id:int}"
+@inject RolService RolService
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject NavigationManager NavManager
+
+<h3>Editar Rol</h3>
+
+@if (rol == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <EditForm Model="rol" OnValidSubmit="ActualizarRol">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label>Nombre Rol</label>
+            <InputText class="form-control" @bind-Value="rol.NombreRol" />
+        </div>
+
+        <div class="form-group">
+            <label>Descripción</label>
+            <InputText class="form-control" @bind-Value="rol.Descripcion" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick='() => NavManager.NavigateTo("/roles")'>Cancelar</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private RolDTO? rol;
+
+    protected override async Task OnInitializedAsync()
+    {
+        rol = await RolService.GetRolByIdAsync(Id);
+    }
+
+    private async Task ActualizarRol()
+    {
+        if (rol != null)
+        {
+            var ok = await RolService.ActualizarRolAsync(rol);
+            if (ok)
+            {
+                NavManager.NavigateTo("/roles");
+            }
+            else
+            {
+                Console.WriteLine("Error al actualizar rol");
+            }
+        }
+    }
+}
