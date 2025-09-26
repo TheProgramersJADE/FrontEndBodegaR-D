@@ -1,46 +1,95 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">FrontEndBodega</a>
+﻿<!-- Agrega esto al <head> para usar íconos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f3f3f3; /* gris cálido */
+        color: #1f2937;
+    }
+
+    .side-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100vh;
+        background-color: green; /* azul marino */
+        color: black;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+    }
+
+    .nav-header {
+        font-size: 1.6rem;
+        font-weight: bold;
+        background-color: lavenderblush; /* marrón oscuro */
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 30px;
+        letter-spacing: 1px;
+        box-shadow: inset 0 0 5px rgba(255,255,255,0.1);
+    }
+
+    .nav-links {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            color: black;
+            background-color: lightgreen; /* azul secundario */
+            text-decoration: none;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+            /*Esto es el disñeo de cuando el puntero se pociona*/
+            .nav-links a:hover {
+                background-color: lavenderblush; /* marrón suave */
+                color: black;
+                border-left: 4px solid #f5f5dc; /* beige claro */
+                transform: translateX(4px);
+            }
+
+            .nav-links a i {
+                width: 20px;
+                font-size: 1.1rem;
+            }
+
+    .main-content {
+        margin-left: 280px;
+        padding: 40px;
+    }
+
+        .main-content h1 {
+            color: limegreen; /* título con marrón elegante */
+        }
+
+</style>
+
+<div class="side-nav">
+    <div class="nav-header">SecureFlow</div>
+    <div class="nav-links">
+        <a href="#inicio"><i class="fas fa-home"></i>Inicio</a>
+        <a href=""><i class="fas fa-user"></i>Login</a>
+        <a href="counter"><i class="fas fa-user"></i>crear usuario</a>
+        <a href="weather"><i class="fas fa-boxes"></i>Lista de usuarios</a>
+        <a href="/roles/crear"><i class="fas fa-chart-line"></i>Crear Roles</a>
+        <a href="/categorias/crear"><i class="fas fa-cog"></i>Crear Categoria</a>
+        <a href="/productos/crear"><i class="fas fa-sign-out-alt"></i>cerrrar sesion </a>
     </div>
-</div>
-
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Login
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Registrar Usuarios
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Lista de Usuarios
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/roles/crear">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Crear Roles
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/categorias/crear">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Crear Categorias
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/productos/crear">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Crear Productos
-            </NavLink>
-        </div>
-    </nav>
 </div>
 
