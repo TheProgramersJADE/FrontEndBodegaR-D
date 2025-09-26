@@ -1,0 +1,191 @@
+﻿@page "/productos"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject ProductoService ProductoService
+@inject NavigationManager NavManager
+
+<h3>📦 Productos</h3>
+
+<div class="mb-3 d-flex gap-2">
+    <input type="number" class="form-control w-25" placeholder="Buscar por Id..." @bind="buscarId" />
+    <input type="text" class="form-control w-25" placeholder="Filtrar por nombre..." @bind="buscarNombre" />
+    <button class="btn btn-primary" @onclick="Buscar">🔍 Buscar</button>
+    <button class="btn btn-secondary" @onclick="CargarProductos">🔄 Reset</button>
+    <button class="btn btn-success ms-auto" @onclick='() => NavManager.NavigateTo("/productos/crear")'>+ Nuevo Producto</button>
+</div>
+
+@if (!_cargado)
+{
+    <p>Cargando...</p>
+}
+else if (productos.Count == 0)
+{
+    <p>No hay productos registrados.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Imagen</th>
+                <th>Nombre</th>
+                <th>Precio Venta</th>
+                <th>Stock</th>
+                <th>Categoría</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in productosPagina)
+            {
+                <tr>
+                    <td>@p.Id</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(p.ImagenUrl))
+                        {
+                            <img src="@p.ImagenUrl" alt="@p.Nombre" style="height:40px;" />
+                        }
+                    </td>
+                    <td>@p.Nombre</td>
+                    <td>@p.PrecioVenta.ToString("C")</td>
+                    <td>@p.StockActual</td>
+                    <td>@(p.CategoriaNombre ?? "-")</td>
+                    <td>
+                        <button class="btn btn-info" @onclick='() => NavManager.NavigateTo($"/productos/ver/{p.Id}")'>Ver</button>
+                        <button class="btn btn-warning" @onclick='() => NavManager.NavigateTo($"/productos/editar/{p.Id}")'>Editar</button>
+                        <button class="btn btn-danger" @onclick="() => EliminarProducto(p.Id)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Paginación -->
+    <nav>
+        <ul class="pagination">
+            <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
+                <button class="page-link" @onclick="PrevPage">« Anterior</button>
+            </li>
+            @for (int i = 1; i <= totalPaginas; i++)
+            {
+                <li class="page-item @(paginaActual == i ? "active" : "")">
+                    <button class="page-link" @onclick="() => CambiarPagina(i)">@i</button>
+                </li>
+            }
+            <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
+                <button class="page-link" @onclick="NextPage">Siguiente »</button>
+            </li>
+        </ul>
+    </nav>
+}
+
+<p>@mensaje</p>
+
+@code {
+    private bool _cargado = false;
+    private bool _primerRender = true;
+    private List<ProductoDTO> productos = new();
+    private List<ProductoDTO> productosPagina = new();
+    private string mensaje = string.Empty;
+
+    private int buscarId;
+    private string buscarNombre = string.Empty;
+
+    // Paginación
+    private int paginaActual = 1;
+    private int tamanioPagina = 8;
+    private int totalPaginas = 1;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_primerRender)
+        {
+            _primerRender = false;
+            await CargarProductos();
+        }
+    }
+
+    private async Task CargarProductos()
+    {
+        try
+        {
+            productos = await ProductoService.GetProductosAsync();
+            paginaActual = 1;
+            CalcularPaginacion();
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"❌ Error al cargar productos: {ex.Message}";
+        }
+        _cargado = true;
+        StateHasChanged();
+    }
+
+    private async Task Buscar()
+    {
+        if (buscarId > 0)
+        {
+            var p = await ProductoService.GetProductoByIdAsync(buscarId);
+            if (p != null)
+            {
+                productos = new List<ProductoDTO> { p };
+                paginaActual = 1;
+                CalcularPaginacion();
+                mensaje = "✅ Producto encontrado.";
+                return;
+            }
+            mensaje = "❌ No se encontró el producto por Id.";
+            return;
+        }
+
+        // filtro por nombre (cliente)
+        if (!string.IsNullOrWhiteSpace(buscarNombre))
+        {
+            var all = await ProductoService.GetProductosAsync();
+            productos = all.Where(x => x.Nombre.Contains(buscarNombre, StringComparison.OrdinalIgnoreCase)).ToList();
+            paginaActual = 1;
+            CalcularPaginacion();
+            mensaje = $"✅ Filtrados por '{buscarNombre}'";
+            return;
+        }
+
+        // Si no hay filtros, recargar todo
+        await CargarProductos();
+    }
+
+    private void CalcularPaginacion()
+    {
+        totalPaginas = (int)Math.Ceiling((double)productos.Count / tamanioPagina);
+        if (totalPaginas == 0) totalPaginas = 1;
+        CambiarPagina(1);
+    }
+
+    private void CambiarPagina(int pagina)
+    {
+        paginaActual = pagina;
+        productosPagina = productos.Skip((paginaActual - 1) * tamanioPagina).Take(tamanioPagina).ToList();
+    }
+
+    private void PrevPage() { if (paginaActual > 1) CambiarPagina(paginaActual - 1); }
+    private void NextPage() { if (paginaActual < totalPaginas) CambiarPagina(paginaActual + 1); }
+
+    private async Task EliminarProducto(int id)
+    {
+        try
+        {
+            var ok = await ProductoService.EliminarProductoAsync(id);
+            if (ok)
+            {
+                mensaje = "✅ Producto eliminado";
+                await CargarProductos();
+            }
+            else mensaje = "❌ Error al eliminar producto";
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"❌ Error al eliminar: {ex.Message}";
+        }
+    }
+}
+

@@ -1,0 +1,106 @@
+﻿@page "/productos/crear"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject ProductoService ProductoService
+@inject NavigationManager NavManager
+@using Microsoft.AspNetCore.Components.Forms
+
+<h3>Crear Producto</h3>
+
+<EditForm Model="producto" OnValidSubmit="HandleCreate">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Nombre</label>
+        <InputText class="form-control" @bind-Value="producto.Nombre" />
+    </div>
+    <div class="mb-3">
+        <label>Descripción</label>
+        <InputTextArea class="form-control" @bind-Value="producto.Descripcion" />
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <label>Precio compra</label>
+            <InputNumber class="form-control" @bind-Value="producto.PrecioCompra" />
+        </div>
+        <div class="col">
+            <label>Precio venta</label>
+            <InputNumber class="form-control" @bind-Value="producto.PrecioVenta" />
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <label>Stock actual</label>
+            <InputNumber class="form-control" @bind-Value="producto.StockActual" />
+        </div>
+        <div class="col">
+            <label>Stock mínimo</label>
+            <InputNumber class="form-control" @bind-Value="producto.StockMinimo" />
+        </div>
+    </div>
+
+    <div class="mb-3 mt-2">
+        <label>Imagen (opcional)</label><br />
+        <InputFile OnChange="OnInputFileChange" />
+        @if (!string.IsNullOrEmpty(producto.ImagenUrl))
+        {
+            <div class="mt-2">
+                <img src="@producto.ImagenUrl" alt="imagen" style="height:80px;" />
+            </div>
+        }
+    </div>
+
+    <button class="btn btn-primary" type="submit">Guardar</button>
+    <button class="btn btn-secondary ms-2" type="button" @onclick='() => NavManager.NavigateTo("/productos")'>Cancelar</button>
+</EditForm>
+
+<p>@mensaje</p>
+
+@code {
+    private ProductoDTO producto = new();
+    private string mensaje = string.Empty;
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file == null) return;
+
+        // Leer archivo y enviarlo al servicio que hace upload (si tu backend soporta)
+        var ms = new MemoryStream();
+        await file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024).CopyToAsync(ms);
+        ms.Position = 0;
+
+        // Ajusta contentType si puedes detectar
+        var uploadedUrl = await ProductoService.SubirImagenAsync(ms, file.Name, file.ContentType);
+        if (!string.IsNullOrEmpty(uploadedUrl))
+        {
+            // Si el backend devuelve la URL directa
+            producto.ImagenUrl = uploadedUrl.Trim('"'); // por si fuera JSON/text
+        }
+        else
+        {
+            mensaje = "⚠️ No se pudo subir la imagen. Verifica la ruta de uploads en el servicio.";
+        }
+    }
+
+    private async Task HandleCreate()
+    {
+        try
+        {
+            var res = await ProductoService.CrearProductoAsync(producto);
+            mensaje = res;
+            if (res.StartsWith("✅"))
+            {
+                NavManager.NavigateTo("/productos");
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"❌ Error: {ex.Message}";
+        }
+    }
+}
+

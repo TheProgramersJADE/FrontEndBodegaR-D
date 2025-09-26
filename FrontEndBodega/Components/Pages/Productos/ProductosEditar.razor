@@ -1,0 +1,73 @@
+﻿@page "/productos/editar/{Id:int}"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject ProductoService ProductoService
+@inject NavigationManager NavManager
+@using Microsoft.AspNetCore.Components.Forms
+
+<h3>Editar Producto</h3>
+
+@if (!_cargado)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <EditForm Model="producto" OnValidSubmit="HandleEdit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <!-- mismos campos que Crear -->
+        <div class="mb-3">
+            <label>Nombre</label>
+            <InputText class="form-control" @bind-Value="producto.Nombre" />
+        </div>
+        <!-- ... resto campos ... -->
+        <div class="mb-3">
+            <label>Imagen</label><br />
+            <InputFile OnChange="OnInputFileChange" />
+            @if (!string.IsNullOrEmpty(producto.ImagenUrl))
+            {
+                <img src="@producto.ImagenUrl" style="height:80px;" />
+            }
+        </div>
+
+        <button class="btn btn-primary" type="submit">Guardar cambios</button>
+        <button class="btn btn-secondary ms-2" @onclick='() => NavManager.NavigateTo("/productos")'>Cancelar</button>
+    </EditForm>
+
+    <p>@mensaje</p>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private ProductoDTO producto = new();
+    private bool _cargado = false;
+    private string mensaje = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var p = await ProductoService.GetProductoByIdAsync(Id);
+        if (p != null) producto = p;
+        _cargado = true;
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file == null) return;
+        var ms = new MemoryStream();
+        await file.OpenReadStream(5 * 1024 * 1024).CopyToAsync(ms);
+        ms.Position = 0;
+        var uploadedUrl = await ProductoService.SubirImagenAsync(ms, file.Name, file.ContentType);
+        if (!string.IsNullOrEmpty(uploadedUrl)) producto.ImagenUrl = uploadedUrl.Trim('"');
+        else mensaje = "⚠️ No se pudo subir la imagen.";
+    }
+
+    private async Task HandleEdit()
+    {
+        var res = await ProductoService.EditarProductoAsync(Id, producto);
+        mensaje = res;
+        if (res.StartsWith("✅")) NavManager.NavigateTo("/productos");
+    }
+}
+

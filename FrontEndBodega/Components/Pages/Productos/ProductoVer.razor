@@ -1,0 +1,44 @@
+﻿@page "/productos/ver/{Id:int}"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject ProductoService ProductoService
+@inject NavigationManager NavManager
+@using Microsoft.AspNetCore.Components.Forms
+
+<h3>Detalle Producto</h3>
+
+@if (!_cargado)
+{
+    <p>Cargando...</p>
+}
+else if (producto == null)
+{
+    <p>No se encontró el producto.</p>
+}
+else
+{
+    <div class="card" style="max-width:600px;">
+        <div class="card-body">
+            <h5 class="card-title">@producto.Nombre</h5>
+            <img src="@producto.ImagenUrl" style="height:120px;" />
+            <p>@producto.Descripcion</p>
+            <p>Precio venta: @producto.PrecioVenta.ToString("C")</p>
+            <p>Stock: @producto.StockActual</p>
+            <p>Categoria: @(producto.CategoriaNombre ?? "-")</p>
+            <button class="btn btn-secondary" @onclick='() => NavManager.NavigateTo("/productos")'>Volver</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private ProductoDTO? producto;
+    private bool _cargado = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        producto = await ProductoService.GetProductoByIdAsync(Id);
+        _cargado = true;
+    }
+}
+

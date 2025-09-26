@@ -25,6 +25,7 @@ builder.Services.AddScoped<RegistroUserService>();
 builder.Services.AddScoped<AutheService>();
 builder.Services.AddScoped<RolService>();
 builder.Services.AddScoped<CategoriaService>();
+builder.Services.AddScoped<ProductoService>();
 
 
 var app = builder.Build();
