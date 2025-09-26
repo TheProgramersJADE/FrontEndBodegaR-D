@@ -21,14 +21,46 @@ else
             <label>Nombre</label>
             <InputText class="form-control" @bind-Value="producto.Nombre" />
         </div>
-        <!-- ... resto campos ... -->
         <div class="mb-3">
-            <label>Imagen</label><br />
-            <InputFile OnChange="OnInputFileChange" />
-            @if (!string.IsNullOrEmpty(producto.ImagenUrl))
-            {
-                <img src="@producto.ImagenUrl" style="height:80px;" />
-            }
+            <label>Descripción</label>
+            <InputTextArea class="form-control" @bind-Value="producto.Descripcion" />
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <label>Precio compra</label>
+                <InputNumber class="form-control" @bind-Value="producto.PrecioCompra" />
+            </div>
+            <div class="col">
+                <label>Precio venta</label>
+                <InputNumber class="form-control" @bind-Value="producto.PrecioVenta" />
+            </div>
+            <div class="col">
+                <label>Costo promedio</label>
+                <InputNumber class="form-control" @bind-Value="producto.CostoPromedio" />
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col">
+                <label>Stock actual</label>
+                <InputNumber class="form-control" @bind-Value="producto.StockActual" />
+            </div>
+            <div class="col">
+                <label>Stock mínimo</label>
+                <InputNumber class="form-control" @bind-Value="producto.StockMinimo" />
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col">
+                <label>Nombre Categoría</label>
+                <InputText class="form-control" @bind-Value="producto.CategoriaNombre" />
+            </div>
+            <div class="col">
+                <label>Nombre Proveedor</label>
+                <InputText class="form-control" @bind-Value="producto.ProveedorNombre" />
+            </div>
         </div>
 
         <button class="btn btn-primary" type="submit">Guardar cambios</button>

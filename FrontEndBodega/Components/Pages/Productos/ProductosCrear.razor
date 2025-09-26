@@ -29,6 +29,10 @@
             <label>Precio venta</label>
             <InputNumber class="form-control" @bind-Value="producto.PrecioVenta" />
         </div>
+        <div class="col">
+            <label>Costo promedio</label>
+            <InputNumber class="form-control" @bind-Value="producto.CostoPromedio" />
+        </div>
     </div>
 
     <div class="row mt-2">
@@ -39,6 +43,17 @@
         <div class="col">
             <label>Stock mínimo</label>
             <InputNumber class="form-control" @bind-Value="producto.StockMinimo" />
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <label>Nombre Categoría</label>
+            <InputText class="form-control" @bind-Value="producto.CategoriaNombre" />
+        </div>
+        <div class="col">
+            <label>Nombre Proveedor</label>
+            <InputText class="form-control" @bind-Value="producto.ProveedorNombre" />
         </div>
     </div>
 
@@ -54,7 +69,7 @@
     </div>
 
     <button class="btn btn-primary" type="submit">Guardar</button>
-    <button class="btn btn-secondary ms-2" type="button" @onclick='() => NavManager.NavigateTo("/productos")'>Cancelar</button>
+    <button class="btn btn-secondary ms-2" type="button" @onclick='() => NavManager.NavigateTo("/productos")'>Listar Productos</button>
 </EditForm>
 
 <p>@mensaje</p>
@@ -63,35 +78,31 @@
     private ProductoDTO producto = new();
     private string mensaje = string.Empty;
 
+    private IBrowserFile? selectedFile; // archivo seleccionado
+
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
-        var file = e.File;
-        if (file == null) return;
-
-        // Leer archivo y enviarlo al servicio que hace upload (si tu backend soporta)
-        var ms = new MemoryStream();
-        await file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024).CopyToAsync(ms);
-        ms.Position = 0;
-
-        // Ajusta contentType si puedes detectar
-        var uploadedUrl = await ProductoService.SubirImagenAsync(ms, file.Name, file.ContentType);
-        if (!string.IsNullOrEmpty(uploadedUrl))
-        {
-            // Si el backend devuelve la URL directa
-            producto.ImagenUrl = uploadedUrl.Trim('"'); // por si fuera JSON/text
-        }
-        else
-        {
-            mensaje = "⚠️ No se pudo subir la imagen. Verifica la ruta de uploads en el servicio.";
-        }
+        selectedFile = e.File; // guardamos el archivo cuando se selecciona
     }
 
     private async Task HandleCreate()
     {
         try
         {
-            var res = await ProductoService.CrearProductoAsync(producto);
+            Stream? fileStream = null;
+            string? fileName = null;
+            string? contentType = null;
+
+            if (selectedFile != null)
+            {
+                fileStream = selectedFile.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024); // máximo 5 MB
+                fileName = selectedFile.Name;
+                contentType = selectedFile.ContentType;
+            }
+
+            var res = await ProductoService.CrearProductoAsync(producto, fileStream, fileName, contentType);
             mensaje = res;
+
             if (res.StartsWith("✅"))
             {
                 NavManager.NavigateTo("/productos");
@@ -103,4 +114,3 @@
         }
     }
 }
-

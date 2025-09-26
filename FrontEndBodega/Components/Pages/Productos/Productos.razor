@@ -42,22 +42,23 @@ else
                 <tr>
                     <td>@p.Id</td>
                     <td>
-                        @if (!string.IsNullOrEmpty(p.ImagenUrl))
-                        {
-                            <img src="@p.ImagenUrl" alt="@p.Nombre" style="height:40px;" />
-                        }
-                    </td>
-                    <td>@p.Nombre</td>
-                    <td>@p.PrecioVenta.ToString("C")</td>
-                    <td>@p.StockActual</td>
-                    <td>@(p.CategoriaNombre ?? "-")</td>
-                    <td>
-                        <button class="btn btn-info" @onclick='() => NavManager.NavigateTo($"/productos/ver/{p.Id}")'>Ver</button>
-                        <button class="btn btn-warning" @onclick='() => NavManager.NavigateTo($"/productos/editar/{p.Id}")'>Editar</button>
-                        <button class="btn btn-danger" @onclick="() => EliminarProducto(p.Id)">Eliminar</button>
-                    </td>
-                </tr>
-            }
+                        <img src="@(string.IsNullOrEmpty(p.ImagenUrl)
+                                          ? "/img/no-image.png"
+                                          : $"https://api-gateway-nodejs-ryd-miih.onrender.com/ApiAdministracion/uploads{p.ImagenUrl}")"
+                     alt="@p.Nombre"
+                     style="height:40px;" />
+            </td>
+            <td>@p.Nombre</td>
+            <td>@p.PrecioVenta.ToString("C")</td>
+            <td>@p.StockActual</td>
+            <td>@(p.CategoriaNombre ?? "-")</td>
+            <td>
+                <button class="btn btn-info" @onclick='() => NavManager.NavigateTo($"/productos/ver/{p.Id}")'>Ver</button>
+                <button class="btn btn-warning" @onclick='() => NavManager.NavigateTo($"/productos/editar/{p.Id}")'>Editar</button>
+                <button class="btn btn-danger" @onclick="() => EliminarProducto(p.Id)">Eliminar</button>
+            </td>
+        </tr>
+                }
         </tbody>
     </table>
 
@@ -139,7 +140,6 @@ else
             return;
         }
 
-        // filtro por nombre (cliente)
         if (!string.IsNullOrWhiteSpace(buscarNombre))
         {
             var all = await ProductoService.GetProductosAsync();
@@ -150,7 +150,6 @@ else
             return;
         }
 
-        // Si no hay filtros, recargar todo
         await CargarProductos();
     }
 
@@ -188,4 +187,3 @@ else
         }
     }
 }
-
