@@ -17,9 +17,9 @@
 {
     <p>Cargando...</p>
 }
-else if (proveedores.Count == 0)
+else if (proveedoresPagina.Count == 0)
 {
-    <p>No hay productos registrados.</p>
+    <p>No hay proveedores registrados.</p>
 }
 else
 {
@@ -35,7 +35,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var p in proveedores)
+            @foreach (var p in proveedoresPagina)
             {
                 <tr>
                     <td>@p.Nombre</td>
@@ -78,15 +78,13 @@ else
 }
 
 @code {
-
     private int paginaActual = 1;
-    private List<ProveedorDTO> proveedoresPagina = new();
     private int tamanioPagina = 8;
     private int totalPaginas = 1;
     private List<ProveedorDTO> proveedores = new();
+    private List<ProveedorDTO> proveedoresPagina = new();
     private bool _cargado = false;
     private string filtroEmpresa = "";
-
     private string mensaje = "";
 
     protected override async Task OnInitializedAsync()
@@ -97,18 +95,20 @@ else
     private async Task CargarProveedores()
     {
         proveedores = await ProveedorService.ObtenerProveedoresAsync();
+        CalcularPaginacion();
+        _cargado = true;
     }
 
-    private void VerProveedor(ProveedorDTO p)
+    private async Task Buscar()
     {
-        mensaje = $"📄 {p.Nombre} - {p.NombreEmpresa} - {p.Telefono} - {p.Email} - {p.Direccion}";
-    }
+        if (string.IsNullOrWhiteSpace(filtroEmpresa))
+        {
+            await CargarProveedores();
+            return;
+        }
 
-    private void EditarProveedor(ProveedorDTO p)
-    {
-        // Redirigir a la página de edición (o usar un modal)
-        // Ejemplo: NavigationManager.NavigateTo($"/proveedores/editar/{p.Id}");
-        mensaje = $"Editar proveedor: {p.Nombre}";
+        proveedores = await ProveedorService.BuscarProveedoresAsync(filtroEmpresa);
+        CalcularPaginacion();
     }
 
     private async Task EliminarProveedor(ProveedorDTO p)
@@ -119,7 +119,7 @@ else
             return;
         }
 
-        var result = await ProveedorService.EliminarProveedorAsync(p); // Implementar método DELETE
+        var result = await ProveedorService.EliminarProveedorAsync(p);
         mensaje = result;
         await CargarProveedores();
     }
@@ -134,15 +134,21 @@ else
     private void CambiarPagina(int pagina)
     {
         paginaActual = pagina;
-        proveedoresPagina = proveedores.Skip((paginaActual - 1) * tamanioPagina).Take(tamanioPagina).ToList();
+        proveedoresPagina = proveedores
+            .Skip((paginaActual - 1) * tamanioPagina)
+            .Take(tamanioPagina)
+            .ToList();
     }
 
-    private void PrevPage() { if (paginaActual > 1) CambiarPagina(paginaActual - 1); }
-    private void NextPage() { if (paginaActual < totalPaginas) CambiarPagina(paginaActual + 1); 
-    }
-
-    private async Task Buscar()
+    private void PrevPage()
     {
-        proveedores = await ProveedorService.BuscarProveedoresAsync(filtroEmpresa);
+        if (paginaActual > 1)
+            CambiarPagina(paginaActual - 1);
+    }
+
+    private void NextPage()
+    {
+        if (paginaActual < totalPaginas)
+            CambiarPagina(paginaActual + 1);
     }
 }
