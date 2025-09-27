@@ -22,10 +22,15 @@ namespace FrontEndBodega.DTO
 
             public string ImagenUrl { get; set; } = string.Empty;
 
-            public string? CategoriaNombre { get; set; }
+        public int CategoriaId { get; set; }      // lo que se envía al backend
+        public string? CategoriaNombre { get; set; } // solo para mostrar en el combo
+        public int ProveedorId { get; set; }      // lo que se envía al backend
+        public string? ProveedorNombre { get; set; } // solo para mostrar en el combo
 
-            public string? ProveedorNombre { get; set; }
+        //public string? CategoriaNombre { get; set; }
 
-            public string EstadoStock { get; set; } = string.Empty;
+        //public string? ProveedorNombre { get; set; }
+
+        public string EstadoStock { get; set; } = string.Empty;
         }
 }

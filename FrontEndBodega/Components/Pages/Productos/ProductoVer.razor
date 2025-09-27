@@ -19,12 +19,27 @@ else
 {
     <div class="card" style="max-width:600px;">
         <div class="card-body">
-            <h5 class="card-title">@producto.Nombre</h5>
+
+            <p>Nombre: @producto.Nombre</p>
+            <img src="@(string.IsNullOrEmpty(producto.ImagenUrl) ? "/img/no-image.png" : $"https://api-gateway-nodejs-ryd-miih.onrender.com{producto.ImagenUrl}")" style="height:120px;" />
+            <p>Descripción: @producto.Descripcion</p>
+            <p>Precio compra: @producto.PrecioCompra.ToString("C")</p>
+            <p>Precio venta: @producto.PrecioVenta.ToString("C")</p>
+            <p>Costo promedio: @producto.CostoPromedio.ToString("C")</p>
+            <p>Stock actual: @producto.StockActual</p>
+            <p>Stock mínimo: @producto.StockMinimo</p>
+            <p>Categoría: @(producto.CategoriaNombre ?? "-")</p>
+            <p>Proveedor: @(producto.ProveedorNombre ?? "-")</p>
+            <p>Estado stock: @producto.EstadoStock</p>
+
+
+            @*CODIGO ANTIGUO*@
+           @*  <h5 class="card-title">@producto.Nombre</h5>
             <img src="@producto.ImagenUrl" style="height:120px;" />
             <p>@producto.Descripcion</p>
             <p>Precio venta: @producto.PrecioVenta.ToString("C")</p>
             <p>Stock: @producto.StockActual</p>
-            <p>Categoria: @(producto.CategoriaNombre ?? "-")</p>
+            <p>Categoria: @(producto.CategoriaNombre ?? "-")</p> *@
             <button class="btn btn-secondary" @onclick='() => NavManager.NavigateTo("/productos")'>Volver</button>
         </div>
     </div>

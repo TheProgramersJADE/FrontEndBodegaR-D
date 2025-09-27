@@ -43,10 +43,11 @@ else
                     <td>@p.Id</td>
                     <td>
                         <img src="@(string.IsNullOrEmpty(p.ImagenUrl)
-                                          ? "/img/no-image.png"
-                                          : $"https://api-gateway-nodejs-ryd-miih.onrender.com/ApiAdministracion/uploads{p.ImagenUrl}")"
+                                 ? "/img/no-image.png"
+                                 : $"https://api-gateway-nodejs-ryd-miih.onrender.com{p.ImagenUrl}")"
                      alt="@p.Nombre"
-                     style="height:40px;" />
+                     style="height:40px; object-fit:cover; border-radius:4px;" />
+
             </td>
             <td>@p.Nombre</td>
             <td>@p.PrecioVenta.ToString("C")</td>
