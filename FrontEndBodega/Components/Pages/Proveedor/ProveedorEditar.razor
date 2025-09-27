@@ -1,0 +1,80 @@
+﻿@page "/proveedores/editar/{Id:int}"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject ProveedorService ProveedorService
+@inject NavigationManager NavManager
+@inject AutheService AutheService
+
+<h3>Editar Proveedor</h3>
+
+@if (proveedor == null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <EditForm Model="@proveedor" OnValidSubmit="GuardarProveedor">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <InputText @bind-Value="proveedor.Nombre" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Nombre Empresa</label>
+            <InputText @bind-Value="proveedor.NombreEmpresa" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Teléfono</label>
+            <InputText @bind-Value="proveedor.Telefono" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <InputText @bind-Value="proveedor.Email" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Dirección</label>
+            <InputText @bind-Value="proveedor.Direccion" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <button type="button" class="btn btn-secondary ms-2" @onclick='() => NavManager.NavigateTo("/proveedores/listado")'>Cancelar</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="alert alert-info mt-3">@mensaje</div>
+    }
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private ProveedorDTO? proveedor;
+    private string mensaje = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var lista = await ProveedorService.ObtenerProveedoresAsync();
+        proveedor = lista.FirstOrDefault(p => p.Id == Id);
+    }
+
+    private async Task GuardarProveedor()
+    {
+        if (proveedor == null) return;
+
+        if (!await AutheService.IsAuthenticated())
+        {
+            mensaje = "❌ Token inválido o sesión expirada.";
+            return;
+        }
+
+        mensaje = await ProveedorService.ActualizarProveedorAsync(proveedor);
+        if (mensaje.Contains("✅"))
+            NavManager.NavigateTo("/proveedores/listado");
+    }
+}

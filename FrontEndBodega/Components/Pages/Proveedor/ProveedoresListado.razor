@@ -1,0 +1,148 @@
+﻿@page "/proveedores/listado"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject ProveedorService ProveedorService
+@inject NavigationManager NavManager
+@inject AutheService AutheService
+
+<h3>Listado de Proveedores</h3>
+
+<div class="mb-3">
+    <input type="text" class="form-control" placeholder="Buscar por empresa..."
+           @bind="filtroEmpresa" />
+    <button class="btn btn-primary mt-2" @onclick="Buscar">Buscar</button>
+</div>
+
+@if (!_cargado)
+{
+    <p>Cargando...</p>
+}
+else if (proveedores.Count == 0)
+{
+    <p>No hay productos registrados.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Empresa</th>
+                <th>Teléfono</th>
+                <th>Email</th>
+                <th>Dirección</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in proveedores)
+            {
+                <tr>
+                    <td>@p.Nombre</td>
+                    <td>@p.NombreEmpresa</td>
+                    <td>@p.Telefono</td>
+                    <td>@p.Email</td>
+                    <td>@p.Direccion</td>
+                    <td>
+                        <button class="btn btn-info" @onclick='() => NavManager.NavigateTo($"/proveedores/ver/{p.Id}")'>Ver</button>
+                        <button class="btn btn-warning" @onclick='() => NavManager.NavigateTo($"/proveedores/editar/{p.Id}")'>Editar</button>
+                        <button class="btn btn-danger" @onclick="() => EliminarProveedor(p)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Paginación -->
+    <nav>
+        <ul class="pagination">
+            <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
+                <button class="page-link" @onclick="PrevPage">« Anterior</button>
+            </li>
+            @for (int i = 1; i <= totalPaginas; i++)
+            {
+                <li class="page-item @(paginaActual == i ? "active" : "")">
+                    <button class="page-link" @onclick="() => CambiarPagina(i)">@i</button>
+                </li>
+            }
+            <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
+                <button class="page-link" @onclick="NextPage">Siguiente »</button>
+            </li>
+        </ul>
+    </nav>
+}
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-info mt-3">@mensaje</div>
+}
+
+@code {
+
+    private int paginaActual = 1;
+    private List<ProveedorDTO> proveedoresPagina = new();
+    private int tamanioPagina = 8;
+    private int totalPaginas = 1;
+    private List<ProveedorDTO> proveedores = new();
+    private bool _cargado = false;
+    private string filtroEmpresa = "";
+
+    private string mensaje = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarProveedores();
+    }
+
+    private async Task CargarProveedores()
+    {
+        proveedores = await ProveedorService.ObtenerProveedoresAsync();
+    }
+
+    private void VerProveedor(ProveedorDTO p)
+    {
+        mensaje = $"📄 {p.Nombre} - {p.NombreEmpresa} - {p.Telefono} - {p.Email} - {p.Direccion}";
+    }
+
+    private void EditarProveedor(ProveedorDTO p)
+    {
+        // Redirigir a la página de edición (o usar un modal)
+        // Ejemplo: NavigationManager.NavigateTo($"/proveedores/editar/{p.Id}");
+        mensaje = $"Editar proveedor: {p.Nombre}";
+    }
+
+    private async Task EliminarProveedor(ProveedorDTO p)
+    {
+        if (!await AutheService.IsAuthenticated())
+        {
+            mensaje = "❌ Sesión expirada o token inválido.";
+            return;
+        }
+
+        var result = await ProveedorService.EliminarProveedorAsync(p); // Implementar método DELETE
+        mensaje = result;
+        await CargarProveedores();
+    }
+
+    private void CalcularPaginacion()
+    {
+        totalPaginas = (int)Math.Ceiling((double)proveedores.Count / tamanioPagina);
+        if (totalPaginas == 0) totalPaginas = 1;
+        CambiarPagina(1);
+    }
+
+    private void CambiarPagina(int pagina)
+    {
+        paginaActual = pagina;
+        proveedoresPagina = proveedores.Skip((paginaActual - 1) * tamanioPagina).Take(tamanioPagina).ToList();
+    }
+
+    private void PrevPage() { if (paginaActual > 1) CambiarPagina(paginaActual - 1); }
+    private void NextPage() { if (paginaActual < totalPaginas) CambiarPagina(paginaActual + 1); 
+    }
+
+    private async Task Buscar()
+    {
+        proveedores = await ProveedorService.BuscarProveedoresAsync(filtroEmpresa);
+    }
+}

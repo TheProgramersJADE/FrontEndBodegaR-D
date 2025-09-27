@@ -26,6 +26,7 @@ builder.Services.AddScoped<AutheService>();
 builder.Services.AddScoped<RolService>();
 builder.Services.AddScoped<CategoriaService>();
 builder.Services.AddScoped<ProductoService>();
+builder.Services.AddScoped<ProveedorService>();
 
 
 var app = builder.Build();

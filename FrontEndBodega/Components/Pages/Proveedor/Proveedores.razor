@@ -1,0 +1,77 @@
+﻿@page "/proveedores"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject ProveedorService ProveedorService
+@inject AutheService AutheService
+@inject NavigationManager NavManager
+
+
+<h3>Registro de Proveedores</h3>
+
+<EditForm Model="@proveedor" OnValidSubmit="GuardarProveedor">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <InputText @bind-Value="proveedor.Nombre" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Nombre Empresa</label>
+        <InputText @bind-Value="proveedor.NombreEmpresa" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Teléfono</label>
+        <InputText @bind-Value="proveedor.Telefono" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <InputText @bind-Value="proveedor.Email" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Dirección</label>
+        <InputText @bind-Value="proveedor.Direccion" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button class="btn btn-secondary ms-2" type="button" @onclick='() => NavManager.NavigateTo("/proveedores/listado")'>Listado de Proveedores</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert alert-info mt-3">@mensaje</div>
+}
+
+@code {
+    private ProveedorDTO proveedor = new();
+    private string mensaje = "";
+
+    private async Task GuardarProveedor()
+    {
+        // 👇 Verificar si el token es válido antes de enviar
+        if (!await AutheService.IsAuthenticated())
+        {
+            mensaje = "❌ Sesión expirada o token inválido. Inicia sesión de nuevo.";
+            return;
+        }
+
+        try
+        {
+            // 👇 Llamada al servicio
+            mensaje = await ProveedorService.CrearProveedor(proveedor);
+
+            // 👇 Solo limpiar formulario si fue exitoso
+            if (mensaje.Contains("✅"))
+                proveedor = new ProveedorDTO();
+        }
+        catch (Exception ex)
+        {
+            // 👇 Captura cualquier error inesperado
+            mensaje = $"❌ Error inesperado: {ex.Message}";
+        }
+    }
+}

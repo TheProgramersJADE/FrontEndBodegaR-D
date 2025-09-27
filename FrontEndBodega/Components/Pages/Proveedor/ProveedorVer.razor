@@ -1,0 +1,35 @@
+﻿@page "/proveedores/ver/{Id:int}"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject ProveedorService ProveedorService
+@inject NavigationManager NavManager
+
+<h3>Detalles del Proveedor</h3>
+
+@if (proveedor == null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <div class="card p-3">
+        <p><b>Nombre:</b> @proveedor.Nombre</p>
+        <p><b>Empresa:</b> @proveedor.NombreEmpresa</p>
+        <p><b>Teléfono:</b> @proveedor.Telefono</p>
+        <p><b>Email:</b> @proveedor.Email</p>
+        <p><b>Dirección:</b> @proveedor.Direccion</p>
+
+        <button class="btn btn-secondary" @onclick='() => NavManager.NavigateTo("/proveedores/listado")'>Volver</button>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private ProveedorDTO? proveedor;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var lista = await ProveedorService.ObtenerProveedoresAsync();
+        proveedor = lista.FirstOrDefault(p => p.Id == Id);
+    }
+}
