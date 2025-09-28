@@ -1,0 +1,76 @@
+﻿@page "/listado-tipos-movimiento"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject TipoMovimientoService TipoMovimientoService
+
+<h3>Listado de Tipos de Movimiento</h3>
+
+@if (tipos == null)
+{
+    <p>Cargando...</p>
+}
+else if (!tipos.Any())
+{
+    <p>No hay tipos de movimiento registrados.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Editar Costo</th>
+                <th>Tipo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in tipos)
+            {
+                <tr>
+                    <td>@t.Id</td>
+                    <td>@t.Nombre</td>
+                    <td>@t.EditarCosto</td>
+                    <td>@t.Tipo</td>
+                    <td>
+                        <button class="btn btn-sm btn-info me-1" @onclick="() => VerMovimiento(t.Id)">Ver</button>
+                        <button class="btn btn-sm btn-warning me-1" @onclick="() => EditarMovimiento(t.Id)">Editar</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => EliminarMovimiento(t.Id)">Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<TipoMovimientoData>? tipos = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tipos = await TipoMovimientoService.GetTiposMovimientoAsync();
+    }
+
+    private void VerMovimiento(int id)
+    {
+        // Aquí puedes navegar a un detalle o mostrar un modal
+        Console.WriteLine($"Ver movimiento ID: {id}");
+    }
+
+    private void EditarMovimiento(int id)
+    {
+        // Aquí puedes navegar a un formulario de edición
+        Console.WriteLine($"Editar movimiento ID: {id}");
+    }
+
+    private async Task EliminarMovimiento(int id)
+    {
+        // Aquí puedes llamar a tu service para eliminar
+        Console.WriteLine($"Eliminar movimiento ID: {id}");
+
+        // Ejemplo:
+        // await TipoMovimientoService.EliminarTipoMovimientoAsync(id);
+        // luego refrescar la lista
+    }
+}

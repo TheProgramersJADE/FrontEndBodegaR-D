@@ -2,6 +2,8 @@
 @using FrontEndBodega.DTO
 @using FrontEndBodega.Services
 @inject TipoMovimientoService TipoMovimientoService
+@inject NavigationManager NavManager
+
 
 <h3>Crear Tipo de Movimiento</h3>
 
@@ -25,6 +27,8 @@
 </div>
 
 <button class="btn btn-primary" @onclick="CrearMovimiento">Crear</button>
+<button class="btn btn-secondary ms-2" type="button" @onclick='() => NavManager.NavigateTo("/listado-tipos-movimiento")'>Listado de Movimientos</button>
+
 
 @if (!string.IsNullOrEmpty(mensaje))
 {

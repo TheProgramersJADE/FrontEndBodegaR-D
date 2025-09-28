@@ -41,5 +41,28 @@
             Console.WriteLine("Error al crear tipo de movimiento: " + errorMsg);
             return null;
         }
+
+        public async Task<List<TipoMovimientoData>> GetTiposMovimientoAsync()
+        {
+            var token = await _authService.GetToken();
+            if (string.IsNullOrEmpty(token)) return new List<TipoMovimientoData>();
+
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.GetAsync("api/tipoMovimientos/lista");
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var result = JsonSerializer.Deserialize<TipoMovimientoListResponse>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                return result?.Data ?? new List<TipoMovimientoData>();
+            }
+
+            return new List<TipoMovimientoData>();
+        }
     }
 }
