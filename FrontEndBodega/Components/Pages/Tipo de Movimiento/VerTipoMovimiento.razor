@@ -1,0 +1,41 @@
+﻿@page "/ver-tipo-movimiento/{Id:int}"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject TipoMovimientoService TipoMovimientoService
+@inject NavigationManager NavManager
+
+<h3>Detalle Tipo de Movimiento</h3>
+
+@if (tipo == null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <div class="card mt-3">
+        <div class="card-body">
+            <p><strong>ID:</strong> @tipo.Id</p>
+            <p><strong>Nombre:</strong> @tipo.Nombre</p>
+            <p><strong>Editar Costo:</strong> @tipo.EditarCosto</p>
+            <p><strong>Tipo:</strong> @tipo.Tipo</p>
+        </div>
+    </div>
+
+    <button class="btn btn-secondary mt-2" @onclick="Volver">Volver</button>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private TipoMovimientoData? tipo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tipo = await TipoMovimientoService.GetTipoMovimientoByIdAsync(Id);
+    }
+
+    private void Volver()
+    {
+        NavManager.NavigateTo("/listado-tipos-movimiento");
+    }
+}
+

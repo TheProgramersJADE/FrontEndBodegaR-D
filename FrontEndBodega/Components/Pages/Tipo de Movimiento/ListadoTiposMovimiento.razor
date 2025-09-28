@@ -2,6 +2,7 @@
 @using FrontEndBodega.DTO
 @using FrontEndBodega.Services
 @inject TipoMovimientoService TipoMovimientoService
+@inject NavigationManager NavManager
 
 <h3>Listado de Tipos de Movimiento</h3>
 
@@ -34,9 +35,9 @@ else
                     <td>@t.EditarCosto</td>
                     <td>@t.Tipo</td>
                     <td>
-                        <button class="btn btn-sm btn-info me-1" @onclick="() => VerMovimiento(t.Id)">Ver</button>
-                        <button class="btn btn-sm btn-warning me-1" @onclick="() => EditarMovimiento(t.Id)">Editar</button>
-                        <button class="btn btn-sm btn-danger" @onclick="() => EliminarMovimiento(t.Id)">Eliminar</button>
+                        <button class="btn btn-info" @onclick='() => NavManager.NavigateTo($"/ver-tipo-movimiento/{t.Id}")'>Ver</button>
+                        <button class="btn btn-warning" @onclick='() => NavManager.NavigateTo($"/editar-tipo-movimiento/{t.Id}")'>Editar</button>
+                        <button class="btn btn-danger" @onclick="() => EliminarMovimiento(t.Id)">Eliminar</button>
                     </td>
                 </tr>
             }
@@ -46,6 +47,9 @@ else
 
 @code {
     private List<TipoMovimientoData>? tipos = null;
+    private string? mensaje;                        // Mensaje que se mostrará en la UI
+    private string alertClass = "alert-success";
+    [Inject] IJSRuntime JS { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -66,11 +70,22 @@ else
 
     private async Task EliminarMovimiento(int id)
     {
-        // Aquí puedes llamar a tu service para eliminar
-        Console.WriteLine($"Eliminar movimiento ID: {id}");
+        var confirmado = await JS.InvokeAsync<bool>("confirm", $"¿Eliminar tipo de movimiento ID {id}?");
+        if (!confirmado) return;
 
-        // Ejemplo:
-        // await TipoMovimientoService.EliminarTipoMovimientoAsync(id);
-        // luego refrescar la lista
+        var exito = await TipoMovimientoService.EliminarTipoMovimientoAsync(id);
+        if (exito)
+        {
+            mensaje = "Tipo de movimiento eliminado ✅";
+            alertClass = "alert-success";
+            // Refrescar lista
+            tipos = await TipoMovimientoService.GetTiposMovimientoAsync();
+        }
+        else
+        {
+            mensaje = "Error al eliminar ❌";
+            alertClass = "alert-danger";
+        }
     }
+
 }

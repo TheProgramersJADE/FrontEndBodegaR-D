@@ -64,5 +64,56 @@
 
             return new List<TipoMovimientoData>();
         }
+
+        // Obtener un tipo de movimiento por ID
+        public async Task<TipoMovimientoData?> GetTipoMovimientoByIdAsync(int id)
+        {
+            var token = await _authService.GetToken();
+            if (string.IsNullOrEmpty(token)) return null;
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.GetAsync($"api/tipoMovimientos/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var result = JsonSerializer.Deserialize<TipoMovimientoResponse>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+                return result?.Data;
+            }
+
+            return null;
+        }
+
+        // Editar un tipo de movimiento
+        public async Task<string> EditarTipoMovimientoAsync(int id, TipoMovimientoDTO tipoMovimiento)
+        {
+            var token = await _authService.GetToken();
+            if (string.IsNullOrEmpty(token)) return "No autorizado";
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.PutAsJsonAsync($"api/tipoMovimientos/{id}", tipoMovimiento);
+            if (response.IsSuccessStatusCode)
+                return "Tipo de movimiento actualizado ✅";
+
+            var errorContent = await response.Content.ReadAsStringAsync();
+            return $"Error al actualizar ❌: {response.StatusCode} - {errorContent}";
+        }
+
+        // Eliminar un tipo de movimiento
+        public async Task<bool> EliminarTipoMovimientoAsync(int id)
+        {
+            var token = await _authService.GetToken();
+            if (string.IsNullOrEmpty(token)) return false;
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.DeleteAsync($"api/tipoMovimientos/{id}");
+            return response.IsSuccessStatusCode;
+        }
+
     }
 }

@@ -1,0 +1,72 @@
+﻿@page "/editar-tipo-movimiento/{Id:int}"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject TipoMovimientoService TipoMovimientoService
+@inject NavigationManager NavManager
+
+<h3>Editar Tipo de Movimiento</h3>
+
+@if (tipo == null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <div class="mb-3">
+        <label>Nombre:</label>
+        <input class="form-control" @bind="tipo.Nombre" />
+    </div>
+    <div class="mb-3">
+        <label>Editar Costo:</label>
+        <input type="checkbox" @bind="tipo.EditarCosto" />
+    </div>
+    <div class="mb-3">
+        <label>Tipo:</label>
+        <select class="form-select" @bind="tipo.Tipo">
+            <option value="1">Ingreso</option>
+            <option value="2">Egreso</option>
+            <option value="3">Otro</option>
+        </select>
+    </div>
+    <button class="btn btn-primary" @onclick="Guardar">Guardar</button>
+}
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert @alertClass mt-2">@mensaje</div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private TipoMovimientoData? tipo;
+    private string mensaje = string.Empty;
+    private string alertClass = "alert-success";
+
+    protected override async Task OnInitializedAsync()
+    {
+        tipo = await TipoMovimientoService.GetTipoMovimientoByIdAsync(Id);
+    }
+
+    private async Task Guardar()
+    {
+        if (tipo == null) return;
+
+        var dto = new TipoMovimientoDTO
+        {
+            Nombre = tipo.Nombre,
+            EditarCosto = tipo.EditarCosto,
+            Tipo = tipo.Tipo
+        };
+
+        var resultado = await TipoMovimientoService.EditarTipoMovimientoAsync(Id, dto);
+        mensaje = resultado;
+        alertClass = resultado.Contains("✅") ? "alert-success" : "alert-danger";
+
+        if (resultado.Contains("✅"))
+        {
+            // Volver al listado después de guardar
+            NavManager.NavigateTo("/listado-tipos-movimiento");
+        }
+    }
+}
+
