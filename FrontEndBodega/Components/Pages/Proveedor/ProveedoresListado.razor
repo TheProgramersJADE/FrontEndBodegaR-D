@@ -8,9 +8,11 @@
 <h3>Listado de Proveedores</h3>
 
 <div class="mb-3">
-    <input type="text" class="form-control" placeholder="Buscar por empresa..."
+    <input type="text" class="form-control" placeholder="Buscar por nombre..."
            @bind="filtroEmpresa" />
     <button class="btn btn-primary mt-2" @onclick="Buscar">Buscar</button>
+    <button class="btn btn-secondary mt-2 ms-2" @onclick="ResetBusqueda">Mostrar Todos</button>
+
 </div>
 
 @if (!_cargado)
@@ -86,6 +88,8 @@ else
     private bool _cargado = false;
     private string filtroEmpresa = "";
     private string mensaje = "";
+    private int idBusqueda;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -108,8 +112,10 @@ else
         }
 
         proveedores = await ProveedorService.BuscarProveedoresAsync(filtroEmpresa);
+        paginaActual = 1;
         CalcularPaginacion();
     }
+
 
     private async Task EliminarProveedor(ProveedorDTO p)
     {
@@ -150,5 +156,18 @@ else
     {
         if (paginaActual < totalPaginas)
             CambiarPagina(paginaActual + 1);
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await Buscar();
+    }
+
+    private async Task ResetBusqueda()
+    {
+        idBusqueda = 0;
+        mensaje = null;
+        await CargarProveedores();
     }
 }

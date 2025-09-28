@@ -75,28 +75,30 @@ namespace FrontEndBodega.Services
 
             if (response.IsSuccessStatusCode)
             {
-                var listaResponse = await response.Content.ReadFromJsonAsync<ProveedoresResponse>();
+                var listaResponse = await response.Content.ReadFromJsonAsync<ProveedoresListaResponse>();
                 return listaResponse?.data ?? new List<ProveedorDTO>();
             }
 
             return new List<ProveedorDTO>();
         }
+
 
         public async Task<List<ProveedorDTO>> BuscarProveedoresAsync(string nombreEmpresa, int page = 0, int size = 100)
         {
             if (!await SetAuthorizationHeader())
                 return new List<ProveedorDTO>();
 
-            var url = $"api/proveedores/buscar?nombreEmpresa={Uri.EscapeDataString(nombreEmpresa)}&page={page}&size={size}";
-            var response = await client.GetAsync(url);
+            var url = $"api/proveedores/buscar?nombre={Uri.EscapeDataString(nombreEmpresa)}&page={page}&size={size}"; var response = await client.GetAsync(url);
 
             if (response.IsSuccessStatusCode)
             {
                 var listaResponse = await response.Content.ReadFromJsonAsync<ProveedoresResponse>();
-                return listaResponse?.data ?? new List<ProveedorDTO>();
+                return listaResponse?.data?.content ?? new List<ProveedorDTO>();
             }
 
             return new List<ProveedorDTO>();
         }
+
+
     }
 }
