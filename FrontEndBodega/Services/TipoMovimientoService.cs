@@ -115,5 +115,33 @@
             return response.IsSuccessStatusCode;
         }
 
+        public async Task<List<TipoMovimientoData>> BuscarTipoMovimientosAsync(string nombre, int pagina = 0, int tamaño = 5)
+        {
+            var token = await _authService.GetToken();
+            if (string.IsNullOrEmpty(token)) return new List<TipoMovimientoData>();
+
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _httpClient.GetAsync($"api/tipoMovimientos/buscar?nombre={Uri.EscapeDataString(nombre)}&page={pagina}&size={tamaño}");
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                // La respuesta tiene "data.content"
+                using var doc = JsonDocument.Parse(json);
+                var content = doc.RootElement.GetProperty("data").GetProperty("content");
+
+                var result = JsonSerializer.Deserialize<List<TipoMovimientoData>>(content.GetRawText(), new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                return result ?? new List<TipoMovimientoData>();
+            }
+
+            return new List<TipoMovimientoData>();
+        }
+
+
     }
 }

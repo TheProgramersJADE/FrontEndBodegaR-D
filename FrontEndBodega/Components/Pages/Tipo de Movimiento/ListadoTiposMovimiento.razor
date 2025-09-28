@@ -6,6 +6,13 @@
 
 <h3>Listado de Tipos de Movimiento</h3>
 
+<div class="mb-3">
+    <input class="form-control" placeholder="Buscar por nombre..." @bind="textoBusqueda" />
+    <button class="btn btn-primary mt-2" @onclick="Buscar">Buscar</button>
+    <button class="btn btn-secondary mt-2 ms-1" @onclick="CargarTodos">Ver Todos</button>
+</div>
+
+
 @if (tipos == null)
 {
     <p>Cargando...</p>
@@ -43,13 +50,40 @@ else
             }
         </tbody>
     </table>
+
+    <!-- Paginación -->
+    <nav>
+        <ul class="pagination">
+            <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
+                <button class="page-link" @onclick="PrevPage">« Anterior</button>
+            </li>
+            @for (int i = 1; i <= totalPaginas; i++)
+            {
+                <li class="page-item @(paginaActual == i ? "active" : "")">
+                    <button class="page-link" @onclick="() => CambiarPagina(i)">@i</button>
+                </li>
+            }
+            <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
+                <button class="page-link" @onclick="NextPage">Siguiente »</button>
+            </li>
+        </ul>
+    </nav>
 }
 
 @code {
     private List<TipoMovimientoData>? tipos = null;
     private string? mensaje;                        // Mensaje que se mostrará en la UI
     private string alertClass = "alert-success";
+    private List<TipoMovimientoDTO> tipoMovimiento = new();
+    private List<TipoMovimientoDTO> tipoMovimientoPagina = new();
+    // Paginación
+    private int paginaActual = 1;
+    private int tamanioPagina = 8;
+    private int totalPaginas = 1;
+    private string textoBusqueda = string.Empty;
     [Inject] IJSRuntime JS { get; set; } = default!;
+    private void PrevPage() { if (paginaActual > 1) CambiarPagina(paginaActual - 1); }
+    private void NextPage() { if (paginaActual < totalPaginas) CambiarPagina(paginaActual + 1); }
 
     protected override async Task OnInitializedAsync()
     {
@@ -86,6 +120,34 @@ else
             mensaje = "Error al eliminar ❌";
             alertClass = "alert-danger";
         }
+    }
+
+    private void CalcularPaginacion()
+    {
+        totalPaginas = (int)Math.Ceiling((double)tipoMovimiento.Count / tamanioPagina);
+        if (totalPaginas == 0) totalPaginas = 1;
+        CambiarPagina(1);
+    }
+
+    private void CambiarPagina(int pagina)
+    {
+        paginaActual = pagina;
+        tipoMovimientoPagina = tipoMovimiento.Skip((paginaActual - 1) * tamanioPagina).Take(tamanioPagina).ToList();
+    }
+
+
+    private async Task Buscar()
+    {
+        if (string.IsNullOrWhiteSpace(textoBusqueda))
+            return;
+
+        tipos = await TipoMovimientoService.BuscarTipoMovimientosAsync(textoBusqueda);
+    }
+
+    private async Task CargarTodos()
+    {
+        textoBusqueda = string.Empty;
+        tipos = await TipoMovimientoService.GetTiposMovimientoAsync();
     }
 
 }
