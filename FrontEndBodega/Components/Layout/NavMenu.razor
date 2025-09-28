@@ -22,6 +22,8 @@
         padding: 20px;
         box-shadow: 3px 0 10px rgba(0,0,0,0.1);
         z-index: 1000;
+        /*Barra de desplazamiento*/
+        overflow-y: auto;
     }
 
     .nav-header {
@@ -81,17 +83,20 @@
 </style>
 
 <div class="side-nav">
-    <div class="nav-header">SecureFlow</div>
+    <div class="nav-header">Bodega R&D</div>
     <div class="nav-links">
-        <a href="#inicio"><i class="fas fa-home"></i>Inicio</a>
-        <a href=""><i class="fas fa-user"></i>Login</a>
-        <a href="counter"><i class="fas fa-user"></i>crear usuario</a>
-        <a href="weather"><i class="fas fa-boxes"></i>Lista de usuarios</a>
-        <a href="/roles/crear"><i class="fas fa-chart-line"></i>Crear Roles</a>
-        <a href="/categorias/crear"><i class="fas fa-cog"></i>Crear Categoria</a>
-        <a href="/proveedores"><i class="fas fa-cog"></i>Crear proveedor</a>
-
-        <a href="/productos/crear"><i class="fas fa-sign-out-alt"></i>cerrrar sesion </a>
+        <a href=""><i class="bi bi-box-arrow-in-right"></i> Login</a>
+        <a href="counter"><i class="bi bi-person-plus"></i> Crear usuario</a>
+        <a href="weather"><i class="bi bi-people"></i> Lista de usuarios</a>
+        <a href="/roles/crear"><i class="bi bi-shield-lock"></i> Crear Roles</a>
+        <a href="/categorias/crear"><i class="bi bi-tags"></i> Crear Categoría</a>
+        <a href="/proveedores"><i class="bi bi-truck"></i> Crear proveedor</a>
+        <a href="/productos/crear"><i class="bi bi-box-seam"></i> Crear productos</a>
+        @* Cambiar los enlaces de las paginas *@
+        <a href="/proveedores"><i class="bi bi-arrow-left-right"></i> Crear Tipo de movimiento</a>
+        <a href="/proveedores"><i class="bi bi-arrow-repeat"></i> Entrada y Salida</a>
+        <a href="/proveedores"><i class="bi bi-box-seam"></i> Catálogo de productos</a>
+        <a href="/proveedores"><i class="bi bi-file-earmark-pdf"></i> Crear reporte PDF</a>
+        <a href=""><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
     </div>
 </div>
-
