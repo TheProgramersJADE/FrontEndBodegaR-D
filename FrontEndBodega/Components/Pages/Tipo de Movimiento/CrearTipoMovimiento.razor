@@ -1,0 +1,59 @@
+﻿@page "/crear-tipo-movimiento"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject TipoMovimientoService TipoMovimientoService
+
+<h3>Crear Tipo de Movimiento</h3>
+
+<div class="mb-3">
+    <label class="form-label">Nombre:</label>
+    <input class="form-control" @bind="nuevoMovimiento.Nombre" placeholder="Ingrese el nombre" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Editar Costo:</label>
+    <input type="checkbox" class="form-check-input" @bind="nuevoMovimiento.EditarCosto" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Tipo:</label>
+    <select class="form-select" @bind="nuevoMovimiento.Tipo">
+        <option value="1">Entrada</option>
+        <option value="2">Salida</option>
+        <option value="3">Ajuste Especial</option>
+    </select>
+</div>
+
+<button class="btn btn-primary" @onclick="CrearMovimiento">Crear</button>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert @(esError ? "alert-danger" : "alert-success")">@mensaje</div>
+}
+
+@code {
+    private TipoMovimientoDTO nuevoMovimiento = new TipoMovimientoDTO();
+    private string mensaje = string.Empty;
+    private bool esError = false;
+
+    private async Task CrearMovimiento()
+    {
+        mensaje = string.Empty;
+        esError = false;
+
+        var resultado = await TipoMovimientoService.CrearTipoMovimiento(nuevoMovimiento);
+
+        if (resultado != null && resultado.Success)
+        {
+            mensaje = $"Tipo de movimiento creado correctamente ✅ (ID: {resultado.Data?.Id})";
+            esError = false;
+            nuevoMovimiento = new TipoMovimientoDTO();
+        }
+        else
+        {
+            mensaje = resultado?.Mensaje ?? "Error: no se pudo crear el tipo de movimiento o token inválido";
+            esError = true;
+        }
+    }
+
+}
