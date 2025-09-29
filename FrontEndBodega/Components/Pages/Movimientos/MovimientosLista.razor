@@ -1,0 +1,73 @@
+﻿@page "/movimientos/lista"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject MovimientoService MovimientoService
+
+<h3>📋 Listado de Movimientos</h3>
+
+@if (cargando)
+{
+    <p><em>Cargando movimientos...</em></p>
+}
+else if (!string.IsNullOrEmpty(error))
+{
+    <p class="text-danger">@error</p>
+}
+else if (movimientos == null || movimientos.Count == 0)
+{
+    <p>No se encontraron movimientos.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Producto</th>
+                <th>Tipo Movimiento</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Usuario</th>
+                <th>Fecha</th>
+                <th>Observaciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var mov in movimientos)
+            {
+                <tr>
+                    <td>@mov.Id</td>
+                    <td>@mov.ProductoNombre</td>
+                    <td>@mov.TipoMovimientoNombre</td>
+                    <td>@mov.Cantidad</td>
+                    <td>@mov.Precio</td>
+                    <td>@mov.Usuario</td>
+                    <td>@mov.FechaStr</td>
+                    <td>@mov.Observaciones</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<MovimientoDetalleDTO>? movimientos;
+    private bool cargando = true;
+    private string error = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            movimientos = await MovimientoService.ObtenerMovimientos();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al cargar movimientos: {ex.Message}";
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+}

@@ -28,6 +28,7 @@ builder.Services.AddScoped<CategoriaService>();
 builder.Services.AddScoped<ProductoService>();
 builder.Services.AddScoped<ProveedorService>();
 builder.Services.AddScoped<TipoMovimientoService>();
+builder.Services.AddScoped<MovimientoService>();
 
 
 var app = builder.Build();

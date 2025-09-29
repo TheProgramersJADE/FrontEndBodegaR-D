@@ -1,0 +1,84 @@
+﻿@page "/movimiento"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject MovimientoService MovimientoService
+
+<h3>Listado de Movimientos</h3>
+
+<div class="mb-3">
+    <input type="text" class="form-control" placeholder="Buscar por producto"
+           @bind="busquedaProducto" @bind:event="oninput" />
+    <input type="text" class="form-control mt-2" placeholder="Buscar por tipo de movimiento"
+           @bind="busquedaTipo" @bind:event="oninput" />
+</div>
+
+@if (!_cargado)
+{
+    <p>Cargando...</p>
+}
+else if (movimientos.Count == 0)
+{
+    <p>No hay movimientos registrados.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Producto</th>
+                <th>Tipo Movimiento</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Usuario</th>
+                <th>Fecha</th>
+                <th>Observaciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var m in movimientosFiltrados)
+            {
+                <tr>
+                    <td>@m.Id</td>
+                    <td>@m.ProductoNombre</td>
+                    <td>@m.TipoMovimientoNombre</td>
+                    <td>@m.Cantidad</td>
+                    <td>@m.Precio</td>
+                    <td>@m.Usuario</td>
+                    <td>@m.FechaStr</td>
+                    <td>@m.Observaciones</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private bool _cargado = false;
+    private List<MovimientoDetalleDTO>? movimientos;
+    private string busquedaProducto = string.Empty;
+    private string busquedaTipo = string.Empty;
+    private string? mensajeError;
+
+    // Lista filtrada que se actualiza según búsqueda
+    private IEnumerable<MovimientoDetalleDTO> movimientosFiltrados => movimientos?
+        .Where(m => m.ProductoNombre.Contains(busquedaProducto, StringComparison.OrdinalIgnoreCase)
+                 && m.TipoMovimientoNombre.Contains(busquedaTipo, StringComparison.OrdinalIgnoreCase))
+        .OrderByDescending(m => m.Fecha)
+        ?? Enumerable.Empty<MovimientoDetalleDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            movimientos = await MovimientoService.ObtenerMovimientos();
+        }
+        catch (Exception ex)
+        {
+            mensajeError = "Error al cargar movimientos: " + ex.Message;
+            movimientos = new List<MovimientoDetalleDTO>();
+        }
+        _cargado = true;
+        StateHasChanged();
+    }
+}
