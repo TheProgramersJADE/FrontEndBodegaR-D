@@ -1,4 +1,7 @@
 ﻿@inject FrontEndBodega.Services.AutheService AuthService
+@inject NavigationManager NavigationManager
+
+
 
 <!-- Agrega esto al <head> para usar íconos -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -113,7 +116,7 @@
                 <a href="/kardex"><i class="bi bi-journal"></i> Kardex</a>
             }
 
-            @if (HasRole("Administrador") || HasRole("SupervisorBodega") || HasRole("Cliente"))
+            @if (HasRole("Usuario"))
             {
                 <a href="/catalogo"><i class="bi bi-box-seam"></i> Catálogo de productos</a>
             }
@@ -123,8 +126,9 @@
                 <a href="/reportes"><i class="bi bi-file-earmark-pdf"></i> Crear reporte PDF</a>
             }
 
-            <!-- Logout -->
-            <a href=""><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+            <a href="javascript:void(0)" @onclick="CerrarSesion">
+                <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+            </a>
         }
     </div>
 </div>
@@ -133,15 +137,43 @@
     private List<string> userRoles = new();
     private bool isInitialized = false;
 
+    protected override async Task OnInitializedAsync()
+    {
+        AuthService.OnAuthStateChanged += async () =>
+        {
+            userRoles = await AuthService.GetUserRoles();
+            isInitialized = true;
+            StateHasChanged();
+        };
+
+        userRoles = await AuthService.GetUserRoles();
+        isInitialized = true;
+    }
+
+
+    private async Task CerrarSesion()
+    {
+        await AuthService.Logout();
+
+        // limpiar roles y refrescar UI
+        userRoles.Clear();
+        isInitialized = true; // ya inicializado, pero sin roles
+        StateHasChanged();
+
+        NavigationManager.NavigateTo("/", true);
+
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             userRoles = await AuthService.GetUserRoles();
             isInitialized = true;
-            StateHasChanged();
+            StateHasChanged(); // 🔄 refresca el menú
         }
     }
+
 
     // 👇 comparación robusta (case-insensitive, ignora mayúsculas/minúsculas)
     private bool HasRole(string role) =>

@@ -32,28 +32,39 @@ namespace FrontEndBodega.Services
 
         }
 
+        public event Action? OnAuthStateChanged;
+
         public async Task SetToken(string token)
         {
             _token = token;
             await _localStore.SetAsync("token", token);
+            OnAuthStateChanged?.Invoke(); // 🔔 Notificar cambio de sesión
         }
 
         public async Task<string?> GetToken()
         {
-            var localStoreResult = await _localStore.GetAsync<string>("token");
-
-            if (string.IsNullOrEmpty(_token))
+            try
             {
-                if (!localStoreResult.Success || string.IsNullOrEmpty(localStoreResult.Value))
-                {
-                    _token = null;
-                    return null;
-                }
-                _token = localStoreResult.Value;
-            }
-            return _token;
+                var localStoreResult = await _localStore.GetAsync<string>("token");
 
+                if (string.IsNullOrEmpty(_token))
+                {
+                    if (!localStoreResult.Success || string.IsNullOrEmpty(localStoreResult.Value))
+                    {
+                        _token = null;
+                        return null;
+                    }
+                    _token = localStoreResult.Value;
+                }
+                return _token;
+            }
+            catch (InvalidOperationException)
+            {
+                // Estamos en prerender → no hay JS todavía
+                return null;
+            }
         }
+
 
         public async Task<bool> IsAuthenticated()
         {
@@ -98,16 +109,15 @@ namespace FrontEndBodega.Services
             if (string.IsNullOrEmpty(token))
                 return new List<string>();
 
-            var handler = new JwtSecurityTokenHandler();
-            var jwt = handler.ReadJwtToken(token);
-
-            var roles = jwt.Claims
-                           .Where(c => c.Type == ClaimTypes.Role || c.Type == "role")
-                           .Select(c => c.Value)
-                           .ToList();
+            var jwtToken = new JwtSecurityToken(token);
+            var roles = jwtToken.Claims
+                                .Where(c => c.Type == "role" || c.Type == ClaimTypes.Role)
+                                .Select(c => c.Value)
+                                .ToList();
 
             return roles;
         }
+
 
 
     }
