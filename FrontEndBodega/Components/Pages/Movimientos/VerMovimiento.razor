@@ -1,0 +1,39 @@
+﻿@page "/movimientos/ver/{Id:int}"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject NavigationManager NavManager
+@inject MovimientoService MovimientoService
+
+<h3>Detalle de Movimiento</h3>
+
+@if (movimiento == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div class="card p-3">
+        <p><b>ID:</b> @movimiento.Id</p>
+        <p><b>Producto:</b> @movimiento.ProductoNombre</p>
+        <p><b>Tipo Movimiento:</b> @movimiento.TipoMovimientoNombre</p>
+        <p><b>Cantidad:</b> @movimiento.Cantidad</p>
+        <p><b>Precio:</b> @movimiento.Precio</p>
+        <p><b>Usuario:</b> @movimiento.Usuario</p>
+        <p><b>Fecha:</b> @movimiento.FechaStr</p>
+        <p><b>Observaciones:</b> @movimiento.Observaciones</p>
+        <button class="btn btn-secondary" @onclick='() => NavManager.NavigateTo("/movimiento")'>Volver</button>
+
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private MovimientoDetalleDTO? movimiento;
+
+    protected override async Task OnInitializedAsync()
+    {
+        movimiento = await MovimientoService.ObtenerMovimientoPorId(Id);
+    }
+}
+

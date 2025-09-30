@@ -2,6 +2,7 @@
 @using FrontEndBodega.DTO
 @using FrontEndBodega.Services
 @inject MovimientoService MovimientoService
+@inject NavigationManager NavManager
 
 <h3>Listado de Movimientos</h3>
 
@@ -33,20 +34,25 @@ else
                 <th>Usuario</th>
                 <th>Fecha</th>
                 <th>Observaciones</th>
+                <th>Acciones</th> @* 👈 Nueva columna *@
             </tr>
         </thead>
         <tbody>
-            @foreach (var m in movimientosFiltrados)
+            @foreach (var mov in movimientos)
             {
                 <tr>
-                    <td>@m.Id</td>
-                    <td>@m.ProductoNombre</td>
-                    <td>@m.TipoMovimientoNombre</td>
-                    <td>@m.Cantidad</td>
-                    <td>@m.Precio</td>
-                    <td>@m.Usuario</td>
-                    <td>@m.FechaStr</td>
-                    <td>@m.Observaciones</td>
+                    <td>@mov.Id</td>
+                    <td>@mov.ProductoNombre</td>
+                    <td>@mov.TipoMovimientoNombre</td>
+                    <td>@mov.Cantidad</td>
+                    <td>@mov.Precio</td>
+                    <td>@mov.Usuario</td>
+                    <td>@mov.FechaStr</td>
+                    <td>@mov.Observaciones</td>
+                    <td>
+                        <button class="btn btn-info btn-sm" @onclick='() => NavManager.NavigateTo($"/movimientos/ver/{mov.Id}")'>Ver</button>
+                        <button class="btn btn-warning btn-sm" @onclick='() => NavManager.NavigateTo($"/movimientos/editar/{mov.Id}")'>Editar</button>
+                    </td>
                 </tr>
             }
         </tbody>

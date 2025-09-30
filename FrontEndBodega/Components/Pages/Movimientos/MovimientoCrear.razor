@@ -1,0 +1,85 @@
+﻿@page "/movimientos/crear"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject MovimientoService MovimientoService
+@inject NavigationManager NavManager
+
+<h3>Crear Movimiento</h3>
+
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div class="alert @alertClass">@mensaje</div>
+}
+
+<EditForm Model="nuevoMovimiento" OnValidSubmit="GuardarMovimiento">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Producto</label>
+        <InputNumber @bind-Value="nuevoMovimiento.IdProducto" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Tipo Movimiento</label>
+        <InputNumber @bind-Value="nuevoMovimiento.IdTipoMovimiento" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Cantidad</label>
+        <InputNumber @bind-Value="nuevoMovimiento.Cantidad" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Precio</label>
+        <InputNumber @bind-Value="nuevoMovimiento.Precio" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Usuario</label>
+        <InputText @bind-Value="nuevoMovimiento.Usuario" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Observaciones</label>
+        <InputTextArea @bind-Value="nuevoMovimiento.Observaciones" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    <button class="btn btn-secondary ms-2" type="button" @onclick='() => NavManager.NavigateTo("/movimiento")'>Listar Productos</button>
+
+</EditForm>
+
+@code {
+    private MovimientoDTO nuevoMovimiento = new MovimientoDTO();
+    private string mensaje = string.Empty;
+    private string alertClass = "alert-success";
+
+    private async Task GuardarMovimiento()
+    {
+        var exito = await MovimientoService.CrearMovimiento(nuevoMovimiento);
+
+        if (exito)
+        {
+            mensaje = "✅ Movimiento creado correctamente.";
+            alertClass = "alert-success";
+
+            // limpiar formulario
+            nuevoMovimiento = new MovimientoDTO();
+
+            // refrescar UI
+            StateHasChanged();
+        }
+        else
+        {
+            mensaje = "❌ Error al guardar el movimiento.";
+            alertClass = "alert-danger";
+        }
+    }
+
+    private void Cancelar()
+    {
+        NavManager.NavigateTo("/movimiento");
+    }
+}

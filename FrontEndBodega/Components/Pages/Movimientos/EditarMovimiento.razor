@@ -1,0 +1,105 @@
+﻿@page "/movimientos/editar/{Id:int}"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject MovimientoService MovimientoService
+@inject NavigationManager NavManager
+
+<h3>Editar Movimiento</h3>
+
+@if (movimiento == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger">@mensajeError</div>
+    }
+
+    <EditForm Model="movimiento" OnValidSubmit="Guardar">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label>Producto</label>
+            <InputText @bind-Value="movimiento.ProductoNombre" class="form-control" disabled />
+        </div>
+
+        <div class="mb-3">
+            <label>Tipo Movimiento</label>
+            <InputNumber @bind-Value="movimiento.IdTipoMovimiento" class="form-control" disabled />
+        </div>
+
+        <div class="mb-3">
+            <label>Tipo Movimiento Nombre</label>
+            <InputText @bind-Value="movimiento.TipoMovimientoNombre" class="form-control" disabled />
+        </div>
+
+        <div class="mb-3">
+            <label>Cantidad</label>
+            <InputNumber @bind-Value="movimiento.Cantidad" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label>Precio</label>
+            <InputNumber @bind-Value="movimiento.Precio" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label>Usuario</label>
+            <InputText @bind-Value="movimiento.Usuario" class="form-control" disabled />
+        </div>
+
+        <div class="mb-3">
+            <label>Fecha</label>
+            <InputText @bind-Value="movimiento.FechaStr" class="form-control" disabled />
+        </div>
+
+        <div class="mb-3">
+            <label>Observaciones</label>
+            <InputTextArea @bind-Value="movimiento.Observaciones" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private MovimientoDetalleDTO? movimiento;
+    private string? mensajeError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        movimiento = await MovimientoService.ObtenerMovimientoPorId(Id);
+
+        if (movimiento == null)
+        {
+            mensajeError = "No se encontró el movimiento.";
+        }
+    }
+
+    private async Task Guardar()
+    {
+        if (movimiento != null)
+        {
+            var exito = await MovimientoService.ActualizarMovimiento(movimiento);
+            if (exito)
+            {
+                NavManager.NavigateTo("/movimientos/lista", forceLoad: true);
+            }
+            else
+            {
+                mensajeError = "No se pudo actualizar el movimiento.";
+            }
+        }
+    }
+
+    private void Cancelar()
+    {
+        NavManager.NavigateTo("/movimientos/lista");
+    }
+}

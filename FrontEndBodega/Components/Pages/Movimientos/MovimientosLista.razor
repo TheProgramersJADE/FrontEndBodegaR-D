@@ -2,6 +2,8 @@
 @using FrontEndBodega.DTO
 @using FrontEndBodega.Services
 @inject MovimientoService MovimientoService
+@inject NavigationManager NavManager
+
 
 <h3>📋 Listado de Movimientos</h3>
 
@@ -30,6 +32,7 @@ else
                 <th>Usuario</th>
                 <th>Fecha</th>
                 <th>Observaciones</th>
+                <th>Acciones</th> @* 👈 Nueva columna *@
             </tr>
         </thead>
         <tbody>
@@ -44,10 +47,15 @@ else
                     <td>@mov.Usuario</td>
                     <td>@mov.FechaStr</td>
                     <td>@mov.Observaciones</td>
+                    <td>
+                        <button class="btn btn-info btn-sm"@onclick='() => NavManager.NavigateTo($"/movimientos/ver/{mov.Id}")'>Ver</button>
+                        <button class="btn btn-warning btn-sm"@onclick='() => NavManager.NavigateTo($"/movimientos/editar/{mov.Id}")'>Editar</button>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
+
 }
 
 @code {
