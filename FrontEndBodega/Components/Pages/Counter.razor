@@ -6,7 +6,7 @@
 
 <center></center><h3>Registrarme</h3>
 
-<EditForm Model="@usuario" OnValidSubmit="GuardarUsuario">
+<EditForm Model="@usuario" OnValidSubmit="RegistrarUsuario">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -55,7 +55,7 @@
     private RegistroUserDTO usuario = new();
     private string? mensaje;
 
-    private async Task GuardarUsuario()
+    private async Task RegistrarUsuario()
     {
         mensaje = await UsuarioService.CrearUsuarioAsync(usuario);
         navigationManager.NavigateTo("/inicio");

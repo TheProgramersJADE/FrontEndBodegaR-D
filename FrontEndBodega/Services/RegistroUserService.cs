@@ -27,12 +27,38 @@ namespace FrontEndBodega.Services
 
             return true;
         }
+        //public async Task<string> CrearUsuarioAsync(RegistroUserDTO usuario)
+        //{
+        //    try
+        //    {
+        //        if (!await SetAuthorizationHeader())
+        //            return "Error: No autorizado";
+
+        //        var response = await _httpClient.PostAsJsonAsync("api/users/", usuario);
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            return "Usuario creado correctamente ✅";
+        //        }
+        //        else
+        //        {
+        //            var errorContent = await response.Content.ReadAsStringAsync();
+        //            return $"Error al crear usuario ❌: {response.StatusCode} - {errorContent}";
+        //        }
+        //    }
+
+        //    catch (Exception ex)
+        //    {
+        //        return $"Excepción: {ex.Message}";
+        //    }
+        //}
+
         public async Task<string> CrearUsuarioAsync(RegistroUserDTO usuario)
         {
             try
             {
-                if (!await SetAuthorizationHeader())
-                    return "Error: No autorizado";
+                // ✅ Comentamos la validación de token
+                // if (!await SetAuthorizationHeader())
+                //     return "Error: No autorizado";
 
                 var response = await _httpClient.PostAsJsonAsync("api/users/", usuario);
                 if (response.IsSuccessStatusCode)
@@ -45,12 +71,12 @@ namespace FrontEndBodega.Services
                     return $"Error al crear usuario ❌: {response.StatusCode} - {errorContent}";
                 }
             }
-
             catch (Exception ex)
             {
                 return $"Excepción: {ex.Message}";
             }
         }
+
 
         // Obtener lista de usuarios
         public async Task<List<UsuarioDTO>> GetUsuariosAsync()
