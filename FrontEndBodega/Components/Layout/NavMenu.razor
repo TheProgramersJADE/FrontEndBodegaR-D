@@ -1,11 +1,13 @@
-﻿<!-- Agrega esto al <head> para usar íconos -->
+﻿@inject FrontEndBodega.Services.AutheService AuthService
+
+<!-- Agrega esto al <head> para usar íconos -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
     body {
         margin: 0;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f3f3f3; /* gris cálido */
+        background-color: #f3f3f3;
         color: #1f2937;
     }
 
@@ -15,21 +17,20 @@
         left: 0;
         width: 250px;
         height: 100vh;
-        background-color: green; /* azul marino */
+        background-color: green;
         color: black;
         display: flex;
         flex-direction: column;
         padding: 20px;
         box-shadow: 3px 0 10px rgba(0,0,0,0.1);
         z-index: 1000;
-        /*Barra de desplazamiento*/
         overflow-y: auto;
     }
 
     .nav-header {
         font-size: 1.6rem;
         font-weight: bold;
-        background-color: lavenderblush; /* marrón oscuro */
+        background-color: lavenderblush;
         padding: 15px;
         border-radius: 10px;
         text-align: center;
@@ -51,18 +52,18 @@
             gap: 12px;
             padding: 12px 18px;
             color: black;
-            background-color: lightgreen; /* azul secundario */
+            background-color: lightgreen;
             text-decoration: none;
             font-weight: 500;
             border-radius: 8px;
             transition: all 0.3s ease;
             border-left: 4px solid transparent;
         }
-            /*Esto es el disñeo de cuando el puntero se pociona*/
+
             .nav-links a:hover {
-                background-color: lavenderblush; /* marrón suave */
+                background-color: lavenderblush;
                 color: black;
-                border-left: 4px solid #f5f5dc; /* beige claro */
+                border-left: 4px solid #f5f5dc;
                 transform: translateX(4px);
             }
 
@@ -77,26 +78,72 @@
     }
 
         .main-content h1 {
-            color: limegreen; /* título con marrón elegante */
+            color: limegreen;
         }
-
 </style>
 
 <div class="side-nav">
     <div class="nav-header">Bodega R&D</div>
     <div class="nav-links">
-        <a href=""><i class="bi bi-box-arrow-in-right"></i> Login</a>
-        <a href="counter"><i class="bi bi-person-plus"></i> Crear usuario</a>
-        <a href="weather"><i class="bi bi-people"></i> Lista de usuarios</a>
-        <a href="/roles/crear"><i class="bi bi-shield-lock"></i> Crear Roles</a>
-        <a href="/categorias/crear"><i class="bi bi-tags"></i> Crear Categoría</a>
-        <a href="/proveedores"><i class="bi bi-truck"></i> Crear proveedor</a>
-        <a href="/productos/crear"><i class="bi bi-box-seam"></i> Crear productos</a>
-        @* Cambiar los enlaces de las paginas *@
-        <a href="/crear-tipo-movimiento"><i class="bi bi-arrow-left-right"></i> Crear Tipo de movimiento</a>
-        <a href="/movimiento"><i class="bi bi-arrow-repeat"></i> Entrada y Salida</a>
-        <a href="/proveedores"><i class="bi bi-box-seam"></i> Catálogo de productos</a>
-        <a href="/proveedores"><i class="bi bi-file-earmark-pdf"></i> Crear reporte PDF</a>
-        <a href=""><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+        @if (!isInitialized)
+        {
+            <p>Cargando menú...</p>
+        }
+        else
+        {
+            <p><strong>Roles cargados:</strong> @string.Join(", ", userRoles)</p>
+
+            <!-- Login siempre visible -->
+            <a href=""><i class="bi bi-box-arrow-in-right"></i> Login</a>
+
+            @if (HasRole("Administrador"))
+            {
+                <a href="counter"><i class="bi bi-person-plus"></i> Crear usuario</a>
+                <a href="weather"><i class="bi bi-people"></i> Lista de usuarios</a>
+                <a href="/roles/crear"><i class="bi bi-shield-lock"></i> Crear Roles</a>
+            }
+
+            @if (HasRole("Administrador") || HasRole("SupervisorBodega"))
+            {
+                <a href="/categorias/crear"><i class="bi bi-tags"></i> Crear Categoría</a>
+                <a href="/proveedores"><i class="bi bi-truck"></i> Crear proveedor</a>
+                <a href="/productos/crear"><i class="bi bi-box-seam"></i> Crear productos</a>
+                <a href="/crear-tipo-movimiento"><i class="bi bi-arrow-left-right"></i> Crear Tipo de movimiento</a>
+                <a href="/movimientos/crear"><i class="bi bi-arrow-repeat"></i> Entrada y Salida</a>
+                <a href="/kardex"><i class="bi bi-journal"></i> Kardex</a>
+            }
+
+            @if (HasRole("Administrador") || HasRole("SupervisorBodega") || HasRole("Cliente"))
+            {
+                <a href="/catalogo"><i class="bi bi-box-seam"></i> Catálogo de productos</a>
+            }
+
+            @if (HasRole("Administrador"))
+            {
+                <a href="/reportes"><i class="bi bi-file-earmark-pdf"></i> Crear reporte PDF</a>
+            }
+
+            <!-- Logout -->
+            <a href=""><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+        }
     </div>
 </div>
+
+@code {
+    private List<string> userRoles = new();
+    private bool isInitialized = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            userRoles = await AuthService.GetUserRoles();
+            isInitialized = true;
+            StateHasChanged();
+        }
+    }
+
+    // 👇 comparación robusta (case-insensitive, ignora mayúsculas/minúsculas)
+    private bool HasRole(string role) =>
+        userRoles.Any(r => string.Equals(r, role, StringComparison.OrdinalIgnoreCase));
+}

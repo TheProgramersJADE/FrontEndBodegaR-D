@@ -28,18 +28,61 @@ namespace FrontEndBodega.Services
         }
 
         // ✅ Crear un movimiento
+        //public async Task<bool> CrearMovimiento(MovimientoDTO movimiento)
+        //{
+        //    if (!await SetAuthorizationHeader())
+        //        return false;
+
+        //    var response = await _httpClient.PostAsJsonAsync(
+        //        "api/movimientosEntradaSalida",
+        //        movimiento
+        //    );
+
+        //    return response.IsSuccessStatusCode;
+        //}
+
+        //public async Task<bool> CrearMovimiento(MovimientoDTO movimiento)
+        //{
+        //    if (!await SetAuthorizationHeader())
+        //        return false;
+
+        //    var response = await _httpClient.PostAsJsonAsync(
+        //        "api/movimientosEntradaSalida/crear",
+        //        movimiento
+        //    );
+
+        //    if (!response.IsSuccessStatusCode)
+        //    {
+        //        var error = await response.Content.ReadAsStringAsync();
+        //        Console.WriteLine($"❌ Error al crear movimiento: {response.StatusCode} - {error}");
+        //    }
+
+        //    return response.IsSuccessStatusCode;
+        //}
+
         public async Task<bool> CrearMovimiento(MovimientoDTO movimiento)
         {
             if (!await SetAuthorizationHeader())
                 return false;
 
+            Console.WriteLine("➡️ Enviando movimiento: " +
+                System.Text.Json.JsonSerializer.Serialize(movimiento));
+
             var response = await _httpClient.PostAsJsonAsync(
-                "api/movimientosEntradaSalida",
+                "api/movimientosEntradaSalida", // 👈 revisa si en tu API es /crear o sin /crear
                 movimiento
             );
 
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"❌ Error al crear movimiento: {response.StatusCode} - {error}");
+            }
+
             return response.IsSuccessStatusCode;
         }
+
+
 
         // ✅ Obtener lista de movimientos desde la API
         public async Task<List<MovimientoDetalleDTO>> ObtenerMovimientos()
@@ -72,5 +115,37 @@ namespace FrontEndBodega.Services
                 return new List<MovimientoDetalleDTO>();
             }
         }
+
+        public async Task<MovimientoDetalleDTO?> ObtenerMovimientoPorId(int id)
+        {
+            var lista = await ObtenerMovimientos(); // llama al GET lista
+            return lista.FirstOrDefault(m => m.Id == id);
+        }
+
+
+        public async Task<bool> ActualizarMovimiento(MovimientoDetalleDTO movimiento)
+        {
+            if (!await SetAuthorizationHeader())
+                return false;
+
+            // Solo enviar campos válidos para la API
+            var update = new
+            {
+                idProducto = movimiento.IdProducto,
+                idTipoMovimiento = movimiento.IdTipoMovimiento,
+                cantidad = movimiento.Cantidad,
+                precio = movimiento.Precio,
+                observaciones = movimiento.Observaciones
+            };
+
+            var response = await _httpClient.PutAsJsonAsync(
+                $"api/movimientosEntradaSalida/{movimiento.Id}",
+                update
+            );
+
+            return response.IsSuccessStatusCode;
+        }
+
+
     }
 }

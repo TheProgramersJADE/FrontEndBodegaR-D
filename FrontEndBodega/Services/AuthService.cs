@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System.IdentityModel.Tokens.Jwt;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
+
 
 namespace FrontEndBodega.Services
 {
@@ -73,5 +75,40 @@ namespace FrontEndBodega.Services
             await _localStore.DeleteAsync("token");
 
         }
+
+        public async Task<string?> GetUserRole()
+        {
+            var token = await GetToken();
+            if (string.IsNullOrEmpty(token))
+                return null;
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(token);
+
+            // Busca claim de rol, puede ser "role" o "roles" según como tu API lo genere
+            var roleClaim = jwt.Claims.FirstOrDefault(c =>
+                c.Type == ClaimTypes.Role || c.Type == "role" || c.Type == "roles");
+
+            return roleClaim?.Value;
+        }
+
+        public async Task<List<string>> GetUserRoles()
+        {
+            var token = await GetToken();
+            if (string.IsNullOrEmpty(token))
+                return new List<string>();
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(token);
+
+            var roles = jwt.Claims
+                           .Where(c => c.Type == ClaimTypes.Role || c.Type == "role")
+                           .Select(c => c.Value)
+                           .ToList();
+
+            return roles;
+        }
+
+
     }
 }
