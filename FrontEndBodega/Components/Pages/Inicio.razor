@@ -1,0 +1,63 @@
+﻿@page "/inicio"
+
+<div class="inicio-container d-flex flex-column align-items-center justify-content-center min-vh-100">
+    <div class="bienvenida-card text-center p-5 shadow-lg">
+        <img src="/imagen/logo.png" alt="Logo" class="logo-img mb-4" />
+        <h1 class="titulo-bienvenida mb-3">¡Bienvenido a Bodega R&D!</h1>
+        <p class="subtitulo-bienvenida mb-4">
+            Administra tus productos, movimientos y reportes de manera rápida y segura.
+        </p>
+        <a href="/catalogo" class="btn btn-success btn-lg">
+            Ir al Catálogo de Productos
+        </a>
+    </div>
+</div>
+
+<style>
+    /* Fondo general */
+    .inicio-container {
+        background-color: #f3f3f3; /* mismo gris cálido del nav */
+    }
+
+    /* Card central */
+    .bienvenida-card {
+        background-color: lavenderblush; /* mismo que nav-header */
+        border-radius: 16px;
+        border: 2px solid #e0e0e0;
+        max-width: 600px;
+        width: 100%;
+        color: #1f2937;
+    }
+
+    /* Logo */
+    .logo-img {
+        max-width: 150px;
+        border-radius: 10px;
+        border: 2px solid lightgreen;
+    }
+
+    /* Título */
+    .titulo-bienvenida {
+        color: limegreen; /* verde del nav-links */
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+    /* Subtítulo */
+    .subtitulo-bienvenida {
+        color: #1f2937;
+        font-size: 1.1rem;
+    }
+
+    /* Botón */
+    .btn-success {
+        background-color: green;
+        border-color: green;
+        transition: all 0.3s ease;
+    }
+
+        .btn-success:hover {
+            background-color: darkgreen;
+            border-color: darkgreen;
+        }
+</style>

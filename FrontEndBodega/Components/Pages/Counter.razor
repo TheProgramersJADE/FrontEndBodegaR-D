@@ -2,6 +2,7 @@
 @using FrontEndBodega.Services;
 @using FrontEndBodega.DTO;
 @inject RegistroUserService UsuarioService
+@inject NavigationManager navigationManager
 
 <center></center><h3>Registrarme</h3>
 
@@ -57,5 +58,6 @@
     private async Task GuardarUsuario()
     {
         mensaje = await UsuarioService.CrearUsuarioAsync(usuario);
+        navigationManager.NavigateTo("/inicio");
     }
 }
