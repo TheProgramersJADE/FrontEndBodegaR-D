@@ -9,6 +9,12 @@
 
     private UserSession userSession = new UserSession();
     private string errorMessage;
+    [Inject] private NavigationManager NavManager { get; set; }
+
+    private void IrARegistro()
+    {
+        NavManager.NavigateTo("/counter");
+    }
 
     private async Task Login()
     {
@@ -140,6 +146,13 @@
                         <button type="submit" class="buttonstyleLogin">Entrar</button>
                     </div>
                 </EditForm>
+
+                <!-- Botón fuera del EditForm para evitar que dispare el Login -->
+                <div class="d-grid gap-2 mb-3">
+                    <button type="button" class="buttonstyleLogin" @onclick="IrARegistro">
+                        Registrarme
+                    </button>
+                </div>
 
                 @if (!string.IsNullOrEmpty(errorMessage))
                 {
