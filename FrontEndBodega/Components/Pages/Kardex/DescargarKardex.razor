@@ -1,0 +1,94 @@
+﻿@page "/kardex-reporte"
+@using FrontEndBodega.Services
+@inject KardexService KardexService
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Reporte Kárdex</PageTitle>
+
+<div class="card shadow p-4 mt-5 mx-auto" style="max-width: 600px;">
+    <h3 class="card-title text-primary mb-4">Generar Reporte Kárdex</h3>
+
+    <p>Utiliza este botón para obtener el reporte completo de los movimientos de almacén en formato PDF.</p>
+
+    <!-- Botón de Descarga -->
+    <button class="btn btn-success btn-lg d-flex align-items-center justify-content-center"
+            @onclick="DescargarKardexPdf"
+            disabled="@_isLoading">
+        @if (_isLoading)
+        {
+            <span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>
+            <span>Generando PDF...</span>
+        }
+        else
+        {
+            <span class="oi oi-data-transfer-download mr-2" aria-hidden="true"></span>
+            <span>Descargar Kárdex Completo</span>
+        }
+    </button>
+
+    <!-- Mensajes de Estado/Error -->
+    @if (!string.IsNullOrEmpty(_message))
+    {
+        <div class="alert @(_isError ? "alert-danger" : "alert-success") mt-3" role="alert">
+            @_message
+        </div>
+    }
+</div>
+
+@code {
+    // Variables de estado para la interfaz
+    private bool _isLoading = false;
+    private string _message = string.Empty;
+    private bool _isError = false;
+
+    // Método que se ejecuta al hacer clic en el botón
+    private async Task DescargarKardexPdf()
+    {
+        // 1. Resetear estados e iniciar carga
+        _isLoading = true;
+        _message = string.Empty;
+        _isError = false;
+
+        try
+        {
+            // 2. Obtener los bytes del PDF llamando al servicio C#
+            // El servicio usará el cliente HTTP "Administracion"
+            var fileBytes = await KardexService.ObtenerKardexPdfAsync();
+
+            if (fileBytes != null && fileBytes.Length > 0)
+            {
+                // 3. Definir nombre y tipo MIME del archivo
+                var fileName = $"Kardex_General_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+                var mimeType = "application/pdf";
+
+                // 4. Invocar la función JavaScript global para iniciar la descarga
+                // Esta función fue añadida en App.razor
+                await JSRuntime.InvokeVoidAsync("downloadFileFromBytes", fileName, fileBytes, mimeType);
+
+                _message = $"¡Éxito! El archivo '{fileName}' ha sido generado y la descarga ha comenzado.";
+            }
+            else
+            {
+                _isError = true;
+                _message = "La API devolvió un PDF vacío. No hay movimientos de Kardex para generar.";
+            }
+        }
+        catch (HttpRequestException)
+        {
+            // Captura errores de conexión o fallos HTTP (ej. 404, 500)
+            _isError = true;
+            _message = "Error de conexión con la API de Administración. Verifica tu conexión o el estado del backend.";
+        }
+        catch (Exception ex)
+        {
+            // Captura cualquier otro error (ej. problemas internos del servicio)
+            _isError = true;
+            _message = $"Ocurrió un error inesperado al descargar el reporte. Detalles: {ex.Message}";
+        }
+        finally
+        {
+            // Finaliza la carga
+            _isLoading = false;
+        }
+    }
+}
