@@ -29,6 +29,8 @@ builder.Services.AddScoped<ProductoService>();
 builder.Services.AddScoped<ProveedorService>();
 builder.Services.AddScoped<TipoMovimientoService>();
 builder.Services.AddScoped<MovimientoService>();
+builder.Services.AddScoped<KardexService>();
+
 
 
 var app = builder.Build();

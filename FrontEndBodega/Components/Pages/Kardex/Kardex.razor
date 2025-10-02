@@ -1,0 +1,64 @@
+﻿@page "/kardex"
+@using FrontEndBodega.DTO
+@using FrontEndBodega.Services
+@inject KardexService KardexService
+
+<h3>Kardex de Productos</h3>
+
+
+@if (kardex == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else if (kardex.Count == 0)
+{
+    <p>No hay movimientos en el Kardex.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Proveedor</th>
+                <th>Tipo Movimiento</th>
+                <th>Entrada</th>
+                <th>Salida</th>
+                <th>Precio</th>
+                <th>Total</th>
+                <th>Stock Actual</th>
+                <th>Observaciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in kardex.OrderBy(k => k.Fecha))
+            {
+                <tr>
+                    <td>@item.Fecha.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@item.NombreProducto</td>
+                    <td>@item.Categoria</td>
+                    <td>@item.Proveedor</td>
+                    <td>@item.TipoMovimiento</td>
+                    <td>@(item.CantidadEntrada > 0 ? item.CantidadEntrada.ToString() : "-")</td>
+                    <td>@(item.CantidadSalida > 0 ? item.CantidadSalida.ToString() : "-")</td>
+                    <td>@item.Precio</td>
+                    <td>@item.Total</td>
+                    <td>@item.StockActual</td>
+                    <td>@item.Observaciones</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<KardexDTO> kardex;
+
+    protected override async Task OnInitializedAsync()
+    {
+        kardex = await KardexService.GetKardexAsync();
+    }
+}
+
