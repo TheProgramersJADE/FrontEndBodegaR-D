@@ -19,8 +19,13 @@
         <InputText @bind-Value="categoria.Descripcion" class="form-control" />
     </div>
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <button class="btn btn-secondary mt-3" @onclick='@(() => NavManager.NavigateTo("/categorias"))'>Listar categorias</button>
+    @* <button type="submit" class="btn btn-primary">Guardar</button>
+    <button class="btn btn-secondary mt-3" @onclick='@(() => NavManager.NavigateTo("/categorias"))'>Listar categorias</button> *@
+
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button class="btn btn-secondary ms-2" type="button" @onclick='@(() => NavManager.NavigateTo("/categorias"))'>Listar categorias</button>
+    </div>
 </EditForm>
 
 @if (!string.IsNullOrEmpty(mensaje))
