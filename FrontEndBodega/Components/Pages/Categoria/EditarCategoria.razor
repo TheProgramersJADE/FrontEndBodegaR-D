@@ -4,7 +4,7 @@
 @inject CategoriaService CategoriaService
 @inject NavigationManager NavManager
 
-<h3>✏ Editar Categoría</h3>
+@* <h3>✏ Editar Categoría</h3>
 
 @if (!_cargado)
 {
@@ -32,8 +32,110 @@ else
 
         <button type="submit" class="btn btn-success">Guardar</button>
         <button type="button" class="btn btn-secondary" @onclick='() => NavManager.NavigateTo("/categorias")'>Cancelar</button>
-    </EditForm>
-}
+    </EditForm> *@
+
+<h3 class="titulo-bienvenida">✏ Editar Categoría</h3>
+
+<div class="categoria-card">
+    @if (!_cargado)
+    {
+        <p>Cargando...</p>
+    }
+    else if (categoria == null)
+    {
+        <p class="text-danger">❌ Categoría no encontrada</p>
+    }
+    else
+    {
+        <EditForm Model="categoria" OnValidSubmit="GuardarCambios">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <table class="table table-hover custom-table">
+                <thead>
+                    <tr>
+                        <th>Campo</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Nombre</strong></td>
+                        <td>
+                            <InputText class="form-control custom-input"
+                                       @bind-Value="categoria.Nombre" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Descripción</strong></td>
+                        <td>
+                            <InputText class="form-control custom-input"
+                                       @bind-Value="categoria.Descripcion" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="acciones">
+                <button type="submit" class="btn btn-success">💾 Guardar</button>
+                <button type="button" class="btn btn-secondary ms-2"
+                        @onclick='() => NavManager.NavigateTo("/categorias")'>
+                    ❌ Cancelar
+                </button>
+            </div>
+        </EditForm>
+    }
+</div>
+
+
+<style>
+    /* Tabla igual que listar */
+    .custom-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+        .custom-table th {
+            background-color: #d8bfd8; /* lavanda */
+            color: #1f2937;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .custom-table td {
+            vertical-align: middle;
+            text-align: left;
+            font-size: 1.05rem;
+            padding: 10px;
+        }
+
+    /* Inputs */
+    .custom-input {
+        border-radius: 10px;
+        border: 2px solid #ccc;
+        padding: 6px 10px;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        width: 100%;
+    }
+
+        .custom-input:focus {
+            border-color: limegreen;
+            box-shadow: 0 0 6px lightgreen;
+            outline: none;
+        }
+
+    /* Acciones */
+    .acciones {
+        margin-top: 15px;
+        display: flex;
+        justify-content: flex-start;
+    }
+
+
+</style>
+
 
 <p>@mensaje</p>
 

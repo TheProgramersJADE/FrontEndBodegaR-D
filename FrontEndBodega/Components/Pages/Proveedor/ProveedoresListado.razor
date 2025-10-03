@@ -5,7 +5,7 @@
 @inject NavigationManager NavManager
 @inject AutheService AutheService
 
-<h3>Listado de Proveedores</h3>
+@* <h3>Listado de Proveedores</h3>
 
 <div class="mb-3">
     <input type="text" class="form-control" placeholder="Buscar por nombre..."
@@ -78,6 +78,261 @@ else
 {
     <div class="alert alert-info mt-3">@mensaje</div>
 }
+ *@
+
+<div class="proveedores-container">
+    <h3>Listado de Proveedores</h3>
+
+    <div class="mb-3">
+        <input type="text" class="form-control" placeholder="Buscar por nombre..."
+               @bind="filtroEmpresa" />
+        <button class="btn btn-primary mt-2" @onclick="Buscar">Buscar</button>
+        <button class="btn btn-secondary mt-2 ms-2" @onclick="ResetBusqueda">Mostrar Todos</button>
+    </div>
+
+    @if (!_cargado)
+    {
+        <p>Cargando...</p>
+    }
+    else if (proveedoresPagina.Count == 0)
+    {
+        <p>No hay proveedores registrados.</p>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Empresa</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Dirección</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in proveedoresPagina)
+                {
+                    <tr>
+                        <td>@p.Nombre</td>
+                        <td>@p.NombreEmpresa</td>
+                        <td>@p.Telefono</td>
+                        <td>@p.Email</td>
+                        <td>@p.Direccion</td>
+                        <td>
+                            <button class="btn btn-info" @onclick='() => NavManager.NavigateTo($"/proveedores/ver/{p.Id}")'>Ver</button>
+                            <button class="btn btn-warning" @onclick='() => NavManager.NavigateTo($"/proveedores/editar/{p.Id}")'>Editar</button>
+                            <button class="btn btn-danger" @onclick="() => EliminarProveedor(p)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Paginación -->
+        <nav>
+            <ul class="pagination">
+                <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
+                    <button class="page-link" @onclick="PrevPage">« Anterior</button>
+                </li>
+                @for (int i = 1; i <= totalPaginas; i++)
+                {
+                    <li class="page-item @(paginaActual == i ? "active" : "")">
+                        <button class="page-link" @onclick="() => CambiarPagina(i)">@i</button>
+                    </li>
+                }
+                <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
+                    <button class="page-link" @onclick="NextPage">Siguiente »</button>
+                </li>
+            </ul>
+        </nav>
+    }
+
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="alert alert-info mt-3">@mensaje</div>
+    }
+</div>
+
+<style>
+    /* Contenedor principal */
+    .proveedores-container {
+        margin-left: 280px;
+        padding: 40px;
+        background-color: #f3f3f3;
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #1f2937;
+        margin: 20px auto;
+    }
+
+        /* Título */
+        .proveedores-container h3 {
+            color: limegreen;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        /* Campo de búsqueda */
+        .proveedores-container .mb-3 {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .proveedores-container .form-control {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            transition: all 0.3s ease;
+        }
+
+            .proveedores-container .form-control:focus {
+                outline: none;
+                border-color: limegreen;
+                box-shadow: 0 0 5px rgba(50,205,50,0.5);
+            }
+
+        /* Botones */
+        .proveedores-container .btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .proveedores-container .btn-primary {
+            background-color: limegreen;
+            color: white;
+        }
+
+            .proveedores-container .btn-primary:hover {
+                background-color: #32cd32;
+            }
+
+        .proveedores-container .btn-secondary {
+            background-color: lightgreen;
+            color: black;
+        }
+
+            .proveedores-container .btn-secondary:hover {
+                background-color: #9acd32;
+            }
+
+        /* Tabla */
+        .proveedores-container table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-color: white;
+        }
+
+        .proveedores-container th,
+        .proveedores-container td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .proveedores-container thead {
+            background-color: limegreen;
+            color: white;
+            font-weight: 600;
+        }
+
+        .proveedores-container tbody tr:nth-child(even) {
+            background-color: #f3f3f3;
+        }
+
+        .proveedores-container tbody tr:hover {
+            background-color: #d4ffd4;
+        }
+
+        /* Botones de acciones */
+        .proveedores-container td .btn {
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            border-radius: 6px;
+            margin-right: 5px;
+        }
+
+        .proveedores-container .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+            .proveedores-container .btn-info:hover {
+                background-color: #138496;
+            }
+
+        .proveedores-container .btn-warning {
+            background-color: #ffc107;
+            color: black;
+        }
+
+            .proveedores-container .btn-warning:hover {
+                background-color: #e0a800;
+            }
+
+        .proveedores-container .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+            .proveedores-container .btn-danger:hover {
+                background-color: #c82333;
+            }
+
+        /* Paginación */
+        .proveedores-container .pagination {
+            display: flex;
+            list-style: none;
+            gap: 5px;
+            margin-top: 20px;
+            padding-left: 0;
+            justify-content: center;
+        }
+
+        .proveedores-container .page-item .page-link {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .proveedores-container .page-item.disabled .page-link {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .proveedores-container .page-item.active .page-link {
+            background-color: limegreen;
+            color: white;
+            border-color: limegreen;
+        }
+
+        .proveedores-container .page-item .page-link:hover:not(.active) {
+            background-color: #d4ffd4;
+        }
+
+        /* Mensaje */
+        .proveedores-container .alert-info {
+            background-color: #e6ffe6;
+            color: #2e7d32;
+            border-radius: 8px;
+            border-left: 4px solid limegreen;
+        }
+</style>
 
 @code {
     private int paginaActual = 1;

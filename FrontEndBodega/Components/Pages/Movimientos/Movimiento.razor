@@ -4,7 +4,7 @@
 @inject MovimientoService MovimientoService
 @inject NavigationManager NavManager
 
-<h3>Listado de Movimientos</h3>
+@* <h3>Listado de Movimientos</h3>
 
 <div class="mb-3">
     <input type="text" class="form-control" placeholder="Buscar por producto"
@@ -34,7 +34,7 @@ else
                 <th>Usuario</th>
                 <th>Fecha</th>
                 <th>Observaciones</th>
-                <th>Acciones</th> @* 👈 Nueva columna *@
+                <th>Acciones</th> 
             </tr>
         </thead>
         <tbody>
@@ -57,7 +57,182 @@ else
             }
         </tbody>
     </table>
-}
+} *@
+
+<div class="movimientos-container">
+    <h3 class="titulo-principal">📋 Listado de Movimientos</h3>
+
+    <!-- Filtros de búsqueda -->
+    <div class="busqueda-container">
+        <input type="text" class="input-busqueda" placeholder="🔍 Buscar por producto"
+               @bind="busquedaProducto" @bind:event="oninput" />
+        <input type="text" class="input-busqueda" placeholder="🔍 Buscar por tipo de movimiento"
+               @bind="busquedaTipo" @bind:event="oninput" />
+    </div>
+
+    @if (!_cargado)
+    {
+        <p class="mensaje-cargando">Cargando...</p>
+    }
+    else if (movimientos.Count == 0)
+    {
+        <p class="mensaje-cargando">No hay movimientos registrados.</p>
+    }
+    else
+    {
+        <table class="tabla-movimientos">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Producto</th>
+                    <th>Tipo Movimiento</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Usuario</th>
+                    <th>Fecha</th>
+                    <th>Observaciones</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var mov in movimientos)
+                {
+                    <tr>
+                        <td>@mov.Id</td>
+                        <td>@mov.ProductoNombre</td>
+                        <td>@mov.TipoMovimientoNombre</td>
+                        <td>@mov.Cantidad</td>
+                        <td>@mov.Precio</td>
+                        <td>@mov.Usuario</td>
+                        <td>@mov.FechaStr</td>
+                        <td>@mov.Observaciones</td>
+                        <td>
+                            <button class="btn btn-ver" @onclick='() => NavManager.NavigateTo($"/movimientos/ver/{mov.Id}")'>Ver</button>
+                            <button class="btn btn-editar" @onclick='() => NavManager.NavigateTo($"/movimientos/editar/{mov.Id}")'>Editar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<style>
+    /* Contenedor */
+    .movimientos-container {
+        margin-left: 280px;
+        padding: 40px;
+        background-color: #f3f3f3;
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #1f2937;
+        margin: 20px auto;
+    }
+
+    /* Título */
+    .titulo-principal {
+        color: limegreen;
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        letter-spacing: 1px;
+    }
+
+    /* Buscadores */
+    .busqueda-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+
+    .input-busqueda {
+        flex: 1;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        transition: all 0.3s ease;
+        min-width: 200px;
+    }
+
+        .input-busqueda:focus {
+            outline: none;
+            border-color: limegreen;
+            box-shadow: 0 0 5px rgba(50,205,50,0.5);
+        }
+
+    /* Mensajes */
+    .mensaje-cargando {
+        background-color: #e6ffe6;
+        color: #2e7d32;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid limegreen;
+    }
+
+    /* Tabla */
+    .tabla-movimientos {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        background-color: white;
+    }
+
+        .tabla-movimientos th,
+        .tabla-movimientos td {
+            padding: 12px 15px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .tabla-movimientos thead {
+            background-color: limegreen;
+            color: white;
+            font-weight: 600;
+        }
+
+        .tabla-movimientos tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .tabla-movimientos tbody tr:hover {
+            background-color: #d4ffd4;
+        }
+
+        /* Botones dentro de la tabla */
+        .tabla-movimientos .btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            border: none;
+            margin-right: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+    .btn-ver {
+        background-color: #17a2b8;
+        color: white;
+    }
+
+        .btn-ver:hover {
+            background-color: #138496;
+        }
+
+    .btn-editar {
+        background-color: #ffc107;
+        color: black;
+    }
+
+        .btn-editar:hover {
+            background-color: #e0a800;
+        }
+</style>
+
+
 
 @code {
     private bool _cargado = false;

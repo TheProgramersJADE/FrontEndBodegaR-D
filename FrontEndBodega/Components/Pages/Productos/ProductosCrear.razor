@@ -5,72 +5,179 @@
 @inject NavigationManager NavManager
 @using Microsoft.AspNetCore.Components.Forms
 
-<h3>Crear Producto</h3>
+<center>
+<div class="main-content">
+    <h3 class="titulo-principal">Crear Producto</h3>
 
-<EditForm Model="producto" OnValidSubmit="HandleCreate">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    <EditForm Model="producto" OnValidSubmit="HandleCreate" class="form-producto">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-    <div class="mb-3">
-        <label>Nombre</label>
-        <InputText class="form-control" @bind-Value="producto.Nombre" />
-    </div>
-    <div class="mb-3">
-        <label>Descripción</label>
-        <InputTextArea class="form-control" @bind-Value="producto.Descripcion" />
-    </div>
+        <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <InputText class="form-control input-producto" @bind-Value="producto.Nombre" />
+        </div>
 
-    <div class="row">
-        <div class="col">
-            <label>Precio compra</label>
-            <InputNumber class="form-control" @bind-Value="producto.PrecioCompra" />
+        <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <InputTextArea class="form-control input-producto" @bind-Value="producto.Descripcion" />
         </div>
-        <div class="col">
-            <label>Precio venta</label>
-            <InputNumber class="form-control" @bind-Value="producto.PrecioVenta" />
-        </div>
-        <div class="col">
-            <label>Costo promedio</label>
-            <InputNumber class="form-control" @bind-Value="producto.CostoPromedio" />
-        </div>
-    </div>
 
-    <div class="row mt-2">
-        <div class="col">
-            <label>Stock actual</label>
-            <InputNumber class="form-control" @bind-Value="producto.StockActual" />
-        </div>
-        <div class="col">
-            <label>Stock mínimo</label>
-            <InputNumber class="form-control" @bind-Value="producto.StockMinimo" />
-        </div>
-    </div>
-
-    <div class="row mt-2">
-        <div class="col">
-            <label>Nombre Categoría</label>
-            <InputText class="form-control" @bind-Value="producto.CategoriaNombre" />
-        </div>
-        <div class="col">
-            <label>Nombre Proveedor</label>
-            <InputText class="form-control" @bind-Value="producto.ProveedorNombre" />
-        </div>
-    </div>
-
-    <div class="mb-3 mt-2">
-        <label>Imagen (opcional)</label><br />
-        <InputFile OnChange="OnInputFileChange" />
-        @if (!string.IsNullOrEmpty(producto.ImagenUrl))
-        {
-            <div class="mt-2">
-                <img src="@producto.ImagenUrl" alt="imagen" style="height:80px;" />
+        <div class="row">
+            <div class="col">
+                <label class="form-label">Precio compra</label>
+                <InputNumber class="form-control input-producto" @bind-Value="producto.PrecioCompra" />
             </div>
-        }
-    </div>
+            <div class="col">
+                <label class="form-label">Precio venta</label>
+                <InputNumber class="form-control input-producto" @bind-Value="producto.PrecioVenta" />
+            </div>
+            <div class="col">
+                <label class="form-label">Costo promedio</label>
+                <InputNumber class="form-control input-producto" @bind-Value="producto.CostoPromedio" />
+            </div>
+        </div>
 
-    <button class="btn btn-primary" type="submit">Guardar</button>
-    <button class="btn btn-secondary ms-2" type="button" @onclick='() => NavManager.NavigateTo("/productos")'>Listar Productos</button>
-</EditForm>
+        <div class="row mt-2">
+            <div class="col">
+                <label class="form-label">Stock actual</label>
+                <InputNumber class="form-control input-producto" @bind-Value="producto.StockActual" />
+            </div>
+            <div class="col">
+                <label class="form-label">Stock mínimo</label>
+                <InputNumber class="form-control input-producto" @bind-Value="producto.StockMinimo" />
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col">
+                <label class="form-label">Nombre Categoría</label>
+                <InputText class="form-control input-producto" @bind-Value="producto.CategoriaNombre" />
+            </div>
+            <div class="col">
+                <label class="form-label">Nombre Proveedor</label>
+                <InputText class="form-control input-producto" @bind-Value="producto.ProveedorNombre" />
+            </div>
+        </div>
+
+        <div class="mb-3 mt-2">
+            <label class="form-label">Imagen (opcional)</label><br />
+            <InputFile OnChange="OnInputFileChange" />
+            @if (!string.IsNullOrEmpty(producto.ImagenUrl))
+            {
+                <div class="mt-2">
+                    <img src="@producto.ImagenUrl" alt="imagen" class="preview-imagen" />
+                </div>
+            }
+        </div>
+
+        <div class="mb-3 botones-producto">
+            <button class="btn btn-guardar">Guardar</button>
+            <button class="btn btn-listar" type="button" @onclick='() => NavManager.NavigateTo("/productos")'>Listar Productos</button>
+        </div>
+    </EditForm>
+</div>
+</center>
+
+<style>
+    /* Contenedor principal */
+    .main-content {
+        margin-left: 280px;
+        padding: 40px;
+        background-color: #f3f3f3;
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: auto;
+    }
+
+    /* Título */
+    .titulo-principal {
+        color: limegreen;
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+        letter-spacing: 1px;
+    }
+
+    /* Formulario */
+    .form-producto {
+        background-color: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        max-width: 900px;
+    }
+
+    /* Labels */
+    .form-label {
+        font-weight: 600;
+        color: #1f2937;
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    /* Inputs */
+    .input-producto {
+        width: 100%;
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        margin-bottom: 15px;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .input-producto:focus {
+            outline: none;
+            border-color: limegreen;
+            box-shadow: 0 0 5px rgba(50,205,50,0.4);
+        }
+
+    /* Previsualización de imagen */
+    .preview-imagen {
+        height: 80px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+
+    /* Botones */
+    .botones-producto {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .btn-guardar {
+        background-color: limegreen;
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+        .btn-guardar:hover {
+            background-color: #32cd32;
+            transform: translateY(-1px);
+        }
+
+    .btn-listar {
+        background-color: lightgreen;
+        color: black;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+        .btn-listar:hover {
+            background-color: #9acd32;
+            transform: translateY(-1px);
+        }
+
+</style>
 
 <p>@mensaje</p>
 

@@ -1,20 +1,20 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
+ <div class="page">
     <div class="sidebar">
         <NavMenu />
     </div>
 
     <main class="main-layout-content">
-        <div class="top-row">
+        @* <div class="top-row">
             <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+        </div> *@
 
         <article class="layout-article">
             @Body
         </article>
     </main>
-</div>
+</div> 
 
 <div id="blazor-error-ui">
     Ocurrió un error inesperado.
@@ -72,14 +72,26 @@
                 text-decoration: underline;
             }
 
-    .layout-article {
+    /* .layout-article {
         background-color: white;
         margin-top: 20px;
         padding: 30px;
         border-radius: 16px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
         min-height: calc(100vh - 80px);
+    } */
+    .layout-article {
+        width: 90%; /* ocupa 90% del ancho de su contenedor */
+        min-width: 300px; /* nunca menor a 300px */
+        max-width: 1200px; /* nunca mayor a 1200px */
+        padding: 2rem; /* padding relativo al tamaño de fuente */
+        margin: 20px auto; /* centrado horizontal */
+        background-color: white;
+        border-radius: 1rem; /* esquinas redondeadas relativas */
+        box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.05);
     }
+
+
 
     #blazor-error-ui {
         background: #f8d7da;

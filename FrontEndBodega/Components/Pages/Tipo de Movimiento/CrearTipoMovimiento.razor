@@ -4,31 +4,136 @@
 @inject TipoMovimientoService TipoMovimientoService
 @inject NavigationManager NavManager
 
+<center>
+<div class="main-content">
+    <h3 class="titulo-principal">Crear Tipo de Movimiento</h3>
 
-<h3>Crear Tipo de Movimiento</h3>
+    <div class="form-movimiento">
+        <div class="mb-3">
+            <label class="form-label">Nombre:</label>
+            <input class="form-control input-movimiento" @bind="nuevoMovimiento.Nombre" placeholder="Ingrese el nombre" />
+        </div>
 
-<div class="mb-3">
-    <label class="form-label">Nombre:</label>
-    <input class="form-control" @bind="nuevoMovimiento.Nombre" placeholder="Ingrese el nombre" />
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" @bind="nuevoMovimiento.EditarCosto" id="editarCostoCheck" />
+            <label class="form-check-label" for="editarCostoCheck">Editar Costo</label>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Tipo:</label>
+            <select class="form-select input-movimiento" @bind="nuevoMovimiento.Tipo">
+                <option value="1">Entrada</option>
+                <option value="2">Salida</option>
+                <option value="3">Ajuste Especial</option>
+            </select>
+        </div>
+
+        <div class="mb-3 botones-movimiento">
+            <button class="btn btn-guardar" @onclick="CrearMovimiento">Crear</button>
+            <button class="btn btn-listar" type="button" @onclick='() => NavManager.NavigateTo("/listado-tipos-movimiento")'>Listado de Movimientos</button>
+        </div>
+    </div>
 </div>
+</center>
 
-<div class="mb-3">
-    <label class="form-label">Editar Costo:</label>
-    <input type="checkbox" class="form-check-input" @bind="nuevoMovimiento.EditarCosto" />
-</div>
+<style> 
+    /* Contenedor principal */
+    .main-content {
+        margin-left: 280px;
+        padding: 40px;
+        background-color: #f3f3f3;
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: auto;
+    }
 
-<div class="mb-3">
-    <label class="form-label">Tipo:</label>
-    <select class="form-select" @bind="nuevoMovimiento.Tipo">
-        <option value="1">Entrada</option>
-        <option value="2">Salida</option>
-        <option value="3">Ajuste Especial</option>
-    </select>
-</div>
+    /* Título */
+    .titulo-principal {
+        color: limegreen;
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+        letter-spacing: 1px;
+    }
 
-<button class="btn btn-primary" @onclick="CrearMovimiento">Crear</button>
-<button class="btn btn-secondary ms-2" type="button" @onclick='() => NavManager.NavigateTo("/listado-tipos-movimiento")'>Listado de Movimientos</button>
+    /* Formulario */
+    .form-movimiento {
+        background-color: white;
+        padding: 25px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        max-width: 500px;
+    }
 
+        /* Labels */
+        .form-movimiento .form-label {
+            font-weight: 600;
+            color: #1f2937;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+    /* Inputs y select */
+    .input-movimiento {
+        width: 100%;
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        margin-bottom: 15px;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .input-movimiento:focus {
+            outline: none;
+            border-color: limegreen;
+            box-shadow: 0 0 5px rgba(50,205,50,0.4);
+        }
+
+    /* Checkbox */
+    .form-check-input {
+        margin-right: 8px;
+        cursor: pointer;
+    }
+
+    /* Botones */
+    .botones-movimiento {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .btn-guardar {
+        background-color: limegreen;
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+        .btn-guardar:hover {
+            background-color: #32cd32;
+            transform: translateY(-1px);
+        }
+
+    .btn-listar {
+        background-color: lightgreen;
+        color: black;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+        .btn-listar:hover {
+            background-color: #9acd32;
+            transform: translateY(-1px);
+        }
+
+</style>
 
 @if (!string.IsNullOrEmpty(mensaje))
 {

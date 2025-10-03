@@ -5,67 +5,237 @@
 @inject NavigationManager NavManager
 
 
-<h3>Buscar Rol por Id</h3>
+<div class="main-content">
+    <h3 class="titulo-principal">Buscar Rol por Id</h3>
 
-<div class="mb-3">
-    <input type="number" @bind="rolIdBuscar" placeholder="Ingrese Id del rol" class="form-control" />
-    <button class="btn btn-primary mt-2" @onclick="BuscarRolPorId">Buscar</button>
-</div>
+    <div class="busqueda-container">
+        <input type="number" @bind="rolIdBuscar" placeholder="Ingrese Id del rol" class="input-busqueda" />
+        <button class="btn btn-buscar" @onclick="BuscarRolPorId">Buscar</button>
+    </div>
 
-@if (rolBuscado != null)
-{
-    <div class="card mt-3">
-        <div class="card-body">
-            <h5 class="card-title">Rol encontrado ✅</h5>
+    @if (rolBuscado != null)
+    {
+        <div class="card-rol">
+            <h5 class="titulo-card">Rol encontrado ✅</h5>
             <p><b>Id:</b> @rolBuscado.Id</p>
             <p><b>Nombre:</b> @rolBuscado.NombreRol</p>
             <p><b>Descripción:</b> @rolBuscado.Descripcion</p>
         </div>
-    </div>
-}
-else if (!string.IsNullOrEmpty(mensajeBusqueda))
-{
-    <div class="alert alert-warning mt-2">@mensajeBusqueda</div>
-}
-<h3>Listado de Roles</h3>
+    }
+    else if (!string.IsNullOrEmpty(mensajeBusqueda))
+    {
+        <div class="mensaje-alerta alerta-warning">@mensajeBusqueda</div>
+    }
 
-@if (!string.IsNullOrEmpty(mensaje))
-{
-    <div class="alert alert-info">@mensaje</div>
-}
+    <h3 class="titulo-principal mt-4">Listado de Roles</h3>
 
-@if (roles == null)
-{
-    <p><em>Cargando...</em></p>
-}
-else
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre Rol</th>
-                <th>Descripción</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var roll in roles)
-            {
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="mensaje-alerta alerta-info">@mensaje</div>
+    }
+
+    @if (roles == null)
+    {
+        <p class="mensaje-cargando"><em>Cargando...</em></p>
+    }
+    else
+    {
+        <table class="tabla-usuarios">
+            <thead>
                 <tr>
-                    <td>@roll.Id</td>
-                    <td>@roll.NombreRol</td>
-                    <td>@roll.Descripcion</td>
-                    <td>
-                        <button class="btn btn-info" @onclick='() => NavManager.NavigateTo($"/roles/ver/{roll.Id}")'>Ver</button>
-                        <button class="btn btn-warning" @onclick='() => NavManager.NavigateTo($"/roles/editar/{roll.Id}")'>Editar</button>
-                        <button class="btn btn-danger" @onclick='() => EliminarRol(roll.Id)'>Eliminar</button>
-                    </td>
+                    <th>ID</th>
+                    <th>Nombre Rol</th>
+                    <th>Descripción</th>
+                    <th>Acciones</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach (var roll in roles)
+                {
+                    <tr>
+                        <td>@roll.Id</td>
+                        <td>@roll.NombreRol</td>
+                        <td>@roll.Descripcion</td>
+                        <td class="acciones">
+                            <button class="btn btn-ver" @onclick='() => NavManager.NavigateTo($"/roles/ver/{roll.Id}")'>Ver</button>
+                            <button class="btn btn-editar" @onclick='() => NavManager.NavigateTo($"/roles/editar/{roll.Id}")'>Editar</button>
+                            <button class="btn btn-eliminar" @onclick='() => EliminarRol(roll.Id)'>Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+<style>
+    /* Contenedor principal */
+    .main-content {
+        margin-left: 280px;
+        padding: 40px;
+        background-color: #f3f3f3;
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #1f2937;
+        margin: 20px auto;
+    }
+
+    /* Títulos */
+    .titulo-principal {
+        color: limegreen;
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        letter-spacing: 1px;
+    }
+
+    /* Campo de búsqueda */
+    .busqueda-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+
+    .input-busqueda {
+        flex: 1;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        transition: all 0.3s ease;
+    }
+
+        .input-busqueda:focus {
+            outline: none;
+            border-color: limegreen;
+            box-shadow: 0 0 5px rgba(50,205,50,0.5);
+        }
+
+    /* Botones de búsqueda */
+    .btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-buscar {
+        background-color: limegreen;
+        color: white;
+    }
+
+        .btn-buscar:hover {
+            background-color: #32cd32;
+        }
+
+    /* Mensajes y alertas */
+    .mensaje-alerta {
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid limegreen;
+    }
+
+    .alerta-warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .alerta-info {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+
+    .mensaje-cargando {
+        background-color: #e6ffe6;
+        color: #2e7d32;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid limegreen;
+    }
+
+    /* Card de rol encontrado */
+    .card-rol {
+        background-color: white;
+        padding: 20px 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        margin-bottom: 25px;
+    }
+
+        .card-rol .titulo-card {
+            color: limegreen;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+
+    /* Tabla */
+    .tabla-usuarios {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        background-color: white;
+    }
+
+        .tabla-usuarios th, .tabla-usuarios td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .tabla-usuarios thead {
+            background-color: limegreen;
+            color: white;
+            font-weight: 600;
+        }
+
+        .tabla-usuarios tbody tr:nth-child(even) {
+            background-color: #f3f3f3;
+        }
+
+        .tabla-usuarios tbody tr:hover {
+            background-color: #d4ffd4;
+        }
+
+    /* Botones dentro de la tabla */
+    .acciones .btn {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        margin-right: 5px;
+    }
+
+    .btn-ver {
+        background-color: #17a2b8;
+        color: white;
+    }
+
+        .btn-ver:hover {
+            background-color: #138496;
+        }
+
+    .btn-editar {
+        background-color: #ffc107;
+        color: black;
+    }
+
+        .btn-editar:hover {
+            background-color: #e0a800;
+        }
+
+    .btn-eliminar {
+        background-color: #dc3545;
+        color: white;
+    }
+
+        .btn-eliminar:hover {
+            background-color: #c82333;
+        }
+
+</style>
 
 @code {
     private List<RolDTO>? roles;

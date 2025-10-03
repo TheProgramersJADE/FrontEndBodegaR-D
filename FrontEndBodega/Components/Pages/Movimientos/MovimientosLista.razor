@@ -32,11 +32,10 @@ else
                 <th>Usuario</th>
                 <th>Fecha</th>
                 <th>Observaciones</th>
-                <th>Acciones</th> @* 👈 Nueva columna *@
+                <th>Acciones</th> 
             </tr>
         </thead>
-        <tbody>
-            @foreach (var mov in movimientos)
+        <tbody>@foreach (var mov in movimientos)
             {
                 <tr>
                     <td>@mov.Id</td>

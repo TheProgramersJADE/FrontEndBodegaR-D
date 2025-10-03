@@ -4,7 +4,7 @@
 @inject CategoriaService CategoriaService
 @inject NavigationManager NavManager
 
-<h3>🔍 Ver Categoría</h3>
+@* <h3>🔍 Ver Categoría</h3>
 
 @if (!_cargado)
 {
@@ -23,7 +23,93 @@ else
         <button class="btn btn-secondary" @onclick='() => NavManager.NavigateTo("/categorias")'>Volver</button>
         <button class="btn btn-warning" @onclick='() => NavManager.NavigateTo($"/categorias/editar/{categoria.Id}")'>Editar</button>
     </div>
-}
+} *@
+
+<h3 class="titulo-bienvenida">🔍 Ver Categoría</h3>
+
+<div class="categoria-card">
+    @if (!_cargado)
+    {
+        <p>Cargando...</p>
+    }
+    else if (categoria == null)
+    {
+        <p class="text-danger">❌ Categoría no encontrada</p>
+    }
+    else
+    {
+        <table class="table table-hover custom-table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@categoria.Id</td>
+                    <td>@categoria.Nombre</td>
+                    <td>@categoria.Descripcion</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="acciones">
+            <button class="btn btn-secondary"
+                    @onclick='() => NavManager.NavigateTo("/categorias")'>
+                ⬅ Volver
+            </button>
+            <button class="btn btn-warning ms-2"
+                    @onclick='() => NavManager.NavigateTo($"/categorias/editar/{categoria.Id}")'>
+                ✏ Editar
+            </button>
+        </div>
+    }
+</div>
+<style>
+    /* Tabla estilo lista */
+    .custom-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+        .custom-table th {
+            background-color: #d8bfd8; /* lavanda */
+            color: #1f2937;
+            text-align: center;
+        }
+
+        .custom-table td {
+            vertical-align: middle;
+            text-align: center;
+            font-size: 1.05rem;
+        }
+
+    /* Acciones */
+    .acciones {
+        margin-top: 15px;
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    /* Botón volver */
+    .btn-secondary {
+        border-radius: 10px;
+        font-weight: 500;
+    }
+
+    /* Botón editar */
+    .btn-warning {
+        background-color: orange;
+        border-color: orange;
+        font-weight: bold;
+        border-radius: 10px;
+    }
+
+</style>
 
 <p>@mensaje</p>
 

@@ -4,52 +4,183 @@
 @inject MovimientoService MovimientoService
 @inject NavigationManager NavManager
 
-<h3>Crear Movimiento</h3>
+<center>
+<div class="main-content">
+    <h3 class="titulo-principal">Crear Movimiento</h3>
 
-@if (!string.IsNullOrEmpty(mensaje))
-{
-    <div class="alert @alertClass">@mensaje</div>
-}
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <div class="alert @alertClass">@mensaje</div>
+    }
 
-<EditForm Model="nuevoMovimiento" OnValidSubmit="GuardarMovimiento">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    <EditForm Model="nuevoMovimiento" OnValidSubmit="GuardarMovimiento" class="form-movimiento">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-    <div class="mb-3">
-        <label>Producto</label>
-        <InputNumber @bind-Value="nuevoMovimiento.IdProducto" class="form-control" />
-    </div>
+        <div class="mb-3">
+            <label class="form-label">Producto</label>
+            <InputNumber @bind-Value="nuevoMovimiento.IdProducto" class="form-control input-movimiento" />
+        </div>
 
-    <div class="mb-3">
-        <label>Tipo Movimiento</label>
-        <InputNumber @bind-Value="nuevoMovimiento.IdTipoMovimiento" class="form-control" />
-    </div>
+        <div class="mb-3">
+            <label class="form-label">Tipo Movimiento</label>
+            <InputNumber @bind-Value="nuevoMovimiento.IdTipoMovimiento" class="form-control input-movimiento" />
+        </div>
 
-    <div class="mb-3">
-        <label>Cantidad</label>
-        <InputNumber @bind-Value="nuevoMovimiento.Cantidad" class="form-control" />
-    </div>
+        <div class="mb-3">
+            <label class="form-label">Cantidad</label>
+            <InputNumber @bind-Value="nuevoMovimiento.Cantidad" class="form-control input-movimiento" />
+        </div>
 
-    <div class="mb-3">
-        <label>Precio</label>
-        <InputNumber @bind-Value="nuevoMovimiento.Precio" class="form-control" />
-    </div>
+        <div class="mb-3">
+            <label class="form-label">Precio</label>
+            <InputNumber @bind-Value="nuevoMovimiento.Precio" class="form-control input-movimiento" />
+        </div>
 
-    <div class="mb-3">
-        <label>Usuario</label>
-        <InputText @bind-Value="nuevoMovimiento.Usuario" class="form-control" />
-    </div>
+        <div class="mb-3">
+            <label class="form-label">Usuario</label>
+            <InputText @bind-Value="nuevoMovimiento.Usuario" class="form-control input-movimiento" />
+        </div>
 
-    <div class="mb-3">
-        <label>Observaciones</label>
-        <InputTextArea @bind-Value="nuevoMovimiento.Observaciones" class="form-control" />
-    </div>
+        <div class="mb-3">
+            <label class="form-label">Observaciones</label>
+            <InputTextArea @bind-Value="nuevoMovimiento.Observaciones" class="form-control input-movimiento" />
+        </div>
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-    <button class="btn btn-secondary ms-2" type="button" @onclick='() => NavManager.NavigateTo("/movimiento")'>Listar Productos</button>
+        <div class="mb-3 botones-movimiento">
+            <button type="submit" class="btn btn-guardar">Guardar</button>
+            <button type="button" class="btn btn-cancelar" @onclick="Cancelar">Cancelar</button>
+            <button class="btn btn-listar" type="button" @onclick='() => NavManager.NavigateTo("/movimiento")'>Listar Productos</button>
+        </div>
+    </EditForm>
+</div>
+</center>
 
-</EditForm>
+<style>
+    /* Contenedor principal */
+    .main-content {
+        margin-left: 280px;
+        padding: 40px;
+        background-color: #f3f3f3;
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: auto;
+    }
+
+    /* Título */
+    .titulo-principal {
+        color: limegreen;
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+        letter-spacing: 1px;
+    }
+
+    /* Formulario */
+    .form-movimiento {
+        background-color: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        max-width: 600px;
+    }
+
+        /* Labels */
+        .form-movimiento .form-label {
+            font-weight: 600;
+            color: #1f2937;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+    /* Inputs y textarea */
+    .input-movimiento {
+        width: 100%;
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        margin-bottom: 15px;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .input-movimiento:focus {
+            outline: none;
+            border-color: limegreen;
+            box-shadow: 0 0 5px rgba(50,205,50,0.4);
+        }
+
+    /* Botones */
+    .botones-movimiento {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .btn-guardar {
+        background-color: limegreen;
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+        .btn-guardar:hover {
+            background-color: #32cd32;
+            transform: translateY(-1px);
+        }
+
+    .btn-cancelar {
+        background-color: #ffcc00;
+        color: black;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+        .btn-cancelar:hover {
+            background-color: #e6b800;
+            transform: translateY(-1px);
+        }
+
+    .btn-listar {
+        background-color: lightgreen;
+        color: black;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+        .btn-listar:hover {
+            background-color: #9acd32;
+            transform: translateY(-1px);
+        }
+
+    /* Alertas */
+    .alert {
+        padding: 10px 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+</style>
 
 @code {
     private MovimientoDTO nuevoMovimiento = new MovimientoDTO();

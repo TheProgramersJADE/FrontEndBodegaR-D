@@ -4,46 +4,194 @@
 @inject RegistroUserService UsuarioServicee
 @inject NavigationManager NavManager
 
-<h3>Lista de Usuarios</h3>
+<div class="main-content">
+    <h3 class="titulo-principal">Lista de Usuarios</h3>
 
-<!-- Campo de búsqueda -->
-<div class="mb-3">
-    <input type="number" @bind="idBusqueda" placeholder="Ingrese ID del usuario" class="form-control" />
-    <button class="btn btn-primary mt-2" @onclick="BuscarUsuario">Buscar</button>
-    <button class="btn btn-secondary mt-2 ms-2" @onclick="ResetBusqueda">Mostrar Todos</button>
-</div>
+    <!-- Campo de búsqueda -->
+    <div class="busqueda-container">
+        <input type="number" @bind="idBusqueda" placeholder="Ingrese ID del usuario" class="input-busqueda" />
+        <button class="btn btn-buscar" @onclick="BuscarUsuario">Buscar</button>
+        <button class="btn btn-mostrar" @onclick="ResetBusqueda">Mostrar Todos</button>
+    </div>
 
-@if (!string.IsNullOrEmpty(mensaje))
-{
-    <p>@mensaje</p>
-}
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <p class="mensaje">@mensaje</p>
+    }
 
-<!-- Tabla de usuarios -->
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Correo</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var user in usuarios)
-        {
+    <!-- Tabla de usuarios -->
+    <table class="tabla-usuarios">
+        <thead>
             <tr>
-                <td>@user.Id</td>
-                <td>@user.NombreCompleto</td>
-                <td>@user.CorreoElectronico</td>
-                <td>
-                    <button class="btn btn-info" @onclick='() => NavManager.NavigateTo($"/usuarios/ver/{user.Id}")'>Ver</button>
-                    <button class="btn btn-warning" @onclick='() => NavManager.NavigateTo($"/usuarios/editar/{user.Id}")'>Editar</button>
-                    <button class="btn btn-danger" @onclick='() => EliminarUsuario(user.Id)'>Eliminar</button>
-                </td>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Acciones</th>
             </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in usuarios)
+            {
+                <tr>
+                    <td>@user.Id</td>
+                    <td>@user.NombreCompleto</td>
+                    <td>@user.CorreoElectronico</td>
+                    <td class="acciones">
+                        <button class="btn btn-ver" @onclick='() => NavManager.NavigateTo($"/usuarios/ver/{user.Id}")'>Ver</button>
+                        <button class="btn btn-editar" @onclick='() => NavManager.NavigateTo($"/usuarios/editar/{user.Id}")'>Editar</button>
+                        <button class="btn btn-eliminar" @onclick='() => EliminarUsuario(user.Id)'>Eliminar</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<style>
+    /* Contenedor principal */
+    .main-content {
+        margin-left: 280px;
+        padding: 40px;
+        background-color: #f3f3f3;
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #1f2937;
+        margin: 20px auto;
+    }
+
+    /* Título */
+    .titulo-principal {
+        color: limegreen;
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        letter-spacing: 1px;
+    }
+
+    /* Campo de búsqueda */
+    .busqueda-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+
+    .input-busqueda {
+        flex: 1;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        transition: all 0.3s ease;
+    }
+
+        .input-busqueda:focus {
+            outline: none;
+            border-color: limegreen;
+            box-shadow: 0 0 5px rgba(50,205,50,0.5);
         }
-    </tbody>
-</table>
+
+    /* Botones */
+    .btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-buscar {
+        background-color: limegreen;
+        color: white;
+    }
+
+        .btn-buscar:hover {
+            background-color: #32cd32;
+        }
+
+    .btn-mostrar {
+        background-color: lightgreen;
+        color: black;
+    }
+
+        .btn-mostrar:hover {
+            background-color: #9acd32;
+        }
+
+    /* Mensaje */
+    .mensaje {
+        background-color: #e6ffe6;
+        color: #2e7d32;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid limegreen;
+    }
+
+    /* Tabla */
+    .tabla-usuarios {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        background-color: white;
+    }
+
+        .tabla-usuarios th, .tabla-usuarios td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .tabla-usuarios thead {
+            background-color: limegreen;
+            color: white;
+            font-weight: 600;
+        }
+
+        .tabla-usuarios tbody tr:nth-child(even) {
+            background-color: #f3f3f3;
+        }
+
+        .tabla-usuarios tbody tr:hover {
+            background-color: #d4ffd4;
+        }
+
+    /* Botones dentro de la tabla */
+    .acciones .btn {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        margin-right: 5px;
+    }
+
+    .btn-ver {
+        background-color: #17a2b8;
+        color: white;
+    }
+
+        .btn-ver:hover {
+            background-color: #138496;
+        }
+
+    .btn-editar {
+        background-color: #ffc107;
+        color: black;
+    }
+
+        .btn-editar:hover {
+            background-color: #e0a800;
+        }
+
+    .btn-eliminar {
+        background-color: #dc3545;
+        color: white;
+    }
+
+        .btn-eliminar:hover {
+            background-color: #c82333;
+        }
+
+</style>
 
 @code {
     private List<UsuarioDTO> usuarios = new List<UsuarioDTO>();

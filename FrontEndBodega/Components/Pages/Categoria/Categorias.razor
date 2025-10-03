@@ -5,7 +5,7 @@
 @inject CategoriaService CategoriaService
 @inject NavigationManager NavManager
 
-<h3>📋 Lista de Categorías</h3>
+@* <h3>📋 Lista de Categorías</h3>
 
 <div class="mb-3 d-flex gap-2">
     <input type="number" class="form-control w-25" placeholder="Buscar por Id..."
@@ -75,8 +75,255 @@ else
                 <button class="page-link" @onclick="NextPage">Siguiente »</button>
             </li>
         </ul>
-    </nav>
-}
+    </nav> *@
+
+<div class="main-content">
+    <h3 class="titulo-principal">📋 Lista de Categorías</h3>
+
+    <div class="busqueda-container">
+        <input type="number" class="input-busqueda w-25" placeholder="Buscar por Id..." @bind="buscarId" />
+        <button class="btn btn-buscar" @onclick="BuscarCategoriaPorId">🔍 Buscar</button>
+        <button class="btn btn-mostrar" @onclick="CargarCategorias">🔄 Reset</button>
+    </div>
+
+    @if (!_cargado)
+    {
+        <p class="mensaje-cargando">Cargando...</p>
+    }
+    else if (categorias.Count == 0)
+    {
+        <p class="mensaje-cargando">No hay categorías registradas.</p>
+    }
+    else
+    {
+        <table class="tabla-usuarios">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cat in categoriasPagina)
+                {
+                    <tr>
+                        <td>@cat.Id</td>
+                        <td>@cat.Nombre</td>
+                        <td>@cat.Descripcion</td>
+                        <td class="acciones">
+                            <button class="btn btn-ver" @onclick='() => NavManager.NavigateTo($"/categorias/ver/{cat.Id}")'>Ver</button>
+                            <button class="btn btn-editar" @onclick='() => NavManager.NavigateTo($"/categorias/editar/{cat.Id}")'>Editar</button>
+                            <button class="btn btn-eliminar" @onclick="() => EliminarCategoria(cat.Id)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Paginación -->
+        <nav>
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
+                    <button class="page-link" @onclick="PrevPage">« Anterior</button>
+                </li>
+                @for (int i = 1; i <= totalPaginas; i++)
+                {
+                    <li class="page-item @(paginaActual == i ? "active" : "")">
+                        <button class="page-link" @onclick="() => CambiarPagina(i)">@i</button>
+                    </li>
+                }
+                <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
+                    <button class="page-link" @onclick="NextPage">Siguiente »</button>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+
+<style>
+    /* Contenedor principal */
+    .main-content {
+        margin-left: 280px;
+        padding: 40px;
+        background-color: #f3f3f3;
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #1f2937;
+        margin: 20px auto;
+    }
+
+    /* Títulos */
+    .titulo-principal {
+        color: limegreen;
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        letter-spacing: 1px;
+    }
+
+    /* Campo de búsqueda */
+    .busqueda-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+
+    .input-busqueda {
+        flex: 1;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        transition: all 0.3s ease;
+    }
+
+        .input-busqueda:focus {
+            outline: none;
+            border-color: limegreen;
+            box-shadow: 0 0 5px rgba(50,205,50,0.5);
+        }
+
+    /* Botones */
+    .btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-buscar {
+        background-color: limegreen;
+        color: white;
+    }
+
+        .btn-buscar:hover {
+            background-color: #32cd32;
+        }
+
+    .btn-mostrar {
+        background-color: lightgreen;
+        color: black;
+    }
+
+        .btn-mostrar:hover {
+            background-color: #9acd32;
+        }
+
+    /* Mensajes */
+    .mensaje-cargando {
+        background-color: #e6ffe6;
+        color: #2e7d32;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid limegreen;
+    }
+
+    /* Tabla */
+    .tabla-usuarios {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        background-color: white;
+    }
+
+        .tabla-usuarios th, .tabla-usuarios td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .tabla-usuarios thead {
+            background-color: limegreen;
+            color: white;
+            font-weight: 600;
+        }
+
+        .tabla-usuarios tbody tr:nth-child(even) {
+            background-color: #f3f3f3;
+        }
+
+        .tabla-usuarios tbody tr:hover {
+            background-color: #d4ffd4;
+        }
+
+    /* Botones dentro de la tabla */
+    .acciones .btn {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        margin-right: 5px;
+    }
+
+    .btn-ver {
+        background-color: #17a2b8;
+        color: white;
+    }
+
+        .btn-ver:hover {
+            background-color: #138496;
+        }
+
+    .btn-editar {
+        background-color: #ffc107;
+        color: black;
+    }
+
+        .btn-editar:hover {
+            background-color: #e0a800;
+        }
+
+    .btn-eliminar {
+        background-color: #dc3545;
+        color: white;
+    }
+
+        .btn-eliminar:hover {
+            background-color: #c82333;
+        }
+
+    /* Paginación */
+    .pagination {
+        display: flex;
+        list-style: none;
+        gap: 5px;
+        margin-top: 20px;
+        padding-left: 0;
+    }
+
+    .page-item .page-link {
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        background-color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .page-item.disabled .page-link {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .page-item.active .page-link {
+        background-color: limegreen;
+        color: white;
+        border-color: limegreen;
+    }
+
+    .page-item .page-link:hover:not(.active) {
+        background-color: #d4ffd4;
+    }
+
+
+</style>
+
 
 <p>@mensaje</p>
 
